@@ -1,0 +1,3819 @@
+[33mcommit 3b88a3273bc7c6e5b5f501305097e6dfb78f8b1f[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31mupstream/master[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Feb 20 13:51:57 2021 +1100
+
+    HAL_ChibiOS: adjust up uart tx stack size
+    
+    lowest was showing 80 bytes free, which is too close to the 64 byte
+    level where we trigger an internal error
+
+[33mcommit 5e0f17522314064c481434a9bda4372dabc4fe0a[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Feb 20 13:47:05 2021 +1100
+
+    HAL_ChibiOS: adjust UART buffer sizes for new UART code
+    
+    this gains about 20k of RAM, and has almost no impact on log download
+    speed at 921600 on a F427. The improved threading means we can afford
+    to have smaller buffers
+
+[33mcommit 4e61ba2dc8252a723eacf89b92d394f44ad1d1bc[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Wed Feb 17 17:56:14 2021 +0000
+
+    AP_HAL_ChibiOS: reduce stack sizes for rcout, uart_rx and storage.
+
+[33mcommit 94de23875143557344b5c754e49f89340d44f3d2[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Wed Feb 10 16:35:36 2021 +0000
+
+    AP_HAL_ChibiOS: disable RCOUT thread on iomcu and rebuild iomcu.
+
+[33mcommit f9c5f9be0082d701b890a109532532b91050d534[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Sat Dec 5 19:16:27 2020 +0000
+
+    AP_HAL_ChibiOS: make dshot DMA unlock event driven in order to allow unlocking from rcout thread
+    
+    refactor rcout into separate thread and process all dshot requests there
+    move uart DMA completion to event model
+    process dshot locks in strick reverse order when unlocking
+    convert Shared_DMA to use mutexes
+    move UART transmit to a thread-per-uart
+    do blocking UART DMA transactions
+    do blocking dshot DMA transactions
+    trim stack sizes
+    cancel dma transactions on dshot when timeout occurs
+    support contention stats on blocking locking
+    move thread supression into chibios_hwdef.py
+    invalidate DMA bounce buffer correctly
+    separate UART initialisation into two halves
+    cleanup UART transaction timeouts
+    add @SYS/uarts.txt
+    move half-duplex handling to TX thread
+    correct thread statistics after use of ExpandingString
+    set unbuffered TX thread priority owner + 1
+    correctly unlock serial_led_send()
+    don't share IMU RX on KakuteF7Mini
+    observe dshot pulse time more accurately.
+    set TRBUFF bit for UART DMA transfers
+    deal with UART DMA timeouts correctly
+    don't deadlock on reverse ordered DMA locks
+    change PORT_INT_REQUIRED_STACK to 128
+
+[33mcommit c388fd92147a77546a29bf77e4175e464f0e2f2a[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Tue Jan 5 21:18:49 2021 +0000
+
+    AP_Filesystem: add @SYS/uarts.txt
+
+[33mcommit a07b238c7d8a1478dc2cb1c641bfcf7ab941c2b7[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Sat Dec 5 19:16:05 2020 +0000
+
+    AP_HAL: add PRIORITY_RCOUT
+    
+    don't allow UART copies
+    add @SYS/uarts.txt
+
+[33mcommit d4aef2dba82c936bd4ff4846f4ffa176072eae8f[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Feb 19 20:35:07 2021 +1100
+
+    autotest: stop using MAVProxy to change mode
+
+[33mcommit 05c9b79a5e42387274eb8b20ec674616c9698d16[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Feb 19 10:58:35 2021 +1100
+
+    autotest: make and declare quadplane.py flake8-clean
+
+[33mcommit c13d229877ae27c08e136fe1533b8d7ff41c63ab[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Feb 18 21:32:49 2021 +1100
+
+    autotest: use self.set_current_waypoint rather than "wp set" to set current wp
+
+[33mcommit 148e2e751f9fdb00ad964494e1028e4a5b1eea86[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Feb 19 10:40:36 2021 +1100
+
+    autotest: add set_current_waypoint
+
+[33mcommit bf7920f2d7b317ba023a5f7884d34a613e2cfb7f[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Wed Feb 17 09:57:43 2021 +0000
+
+    AP_Scripting: use helper for not supported error saving 1K of flash
+
+[33mcommit b7044d37085d8d2987c5f69181a1f65e614950e6[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Feb 18 13:49:09 2021 +1100
+
+    autotest: remove use of global expect_list
+
+[33mcommit 2d17f019b62212ed8387b4c322078b987ceabc3e[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Feb 18 13:47:19 2021 +1100
+
+    autotest: remove pointless manipulation of expect list
+    
+    start_sitl and start_mavproxy already do this stuff
+
+[33mcommit dcc04ccd09c60c5d812e830418a97398e536677b[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Feb 18 15:12:25 2021 +1100
+
+    autotest: stop using MAVProxy to change modes
+
+[33mcommit 2c1df16442f683d88bd6bc43103fe8542f2bbb72[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Feb 18 11:33:32 2021 +1100
+
+    autotest: increase button message timeout to allow for Valgrind speed
+
+[33mcommit ad06a616b896c94ad6b52258ccf2c5de4e443e2f[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Feb 18 11:24:20 2021 +1100
+
+    autotest: adjust for low log transfer rate under valgrind
+
+[33mcommit bcc1cb9dbb8050a851393771913f8f9bd9fa86d3[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Mon Jan 25 17:02:07 2021 +1100
+
+    autotest: use get_parameter in place of mav's param object
+    
+    This is the only place in the code that does this
+
+[33mcommit b1ccf3b3f87045870e8f252b3945003b67c1d30a[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Mon Feb 8 20:34:19 2021 +1100
+
+    autotest: add test for rangefinder-based proximity avoidance enablement
+
+[33mcommit f0f87be06debb086492cefdcfb65ddc8f9a8ffb3[m
+Author: Leonard Hall <leonardthall@gmail.com>
+Date:   Sat Jan 4 16:55:34 2020 +1030
+
+    AC_PID: AC_PI_2D format changes
+
+[33mcommit 7eb4e9b370e71c923fdb1dd6565555db46851b19[m
+Author: mateksys <tech@mateksys.com>
+Date:   Wed Feb 17 17:27:36 2021 +0800
+
+    AP_Periph: set PORT defaults for F405-MatekGPS
+
+[33mcommit 97c2b7228ebd7ca2cf7eb0c1bdc04b812209121d[m
+Author: mateksys <tech@mateksys.com>
+Date:   Tue Feb 9 20:58:54 2021 +0800
+
+    AP_Periph: Matek F303 and F405 AP_Periph use DSP310 baro
+
+[33mcommit 3cf1b9444f59fd45527c05cc83c1cdcc322d1ab3[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 17 23:08:36 2021 +1100
+
+    autotest: get_sim_time_cached in NMEA output test to stop losing msgs
+
+[33mcommit ce61f4450538fdabf925f4d1ff710f2a7e7b4580[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 17 23:06:52 2021 +1100
+
+    autotest: reset SITL commandline after fetching unhidden parameters
+    
+    this makes a difference under Valgrind, which has to reboot slightly differently to normal SITL
+
+[33mcommit e221e6ce459393bc6909d8be92406b39969377b9[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Feb 12 21:14:08 2021 +1100
+
+    autotest: flake8 compliance for ardusub.py
+
+[33mcommit 628a3843b28c29ef332c4a254692944e01a60675[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Feb 12 13:44:28 2021 +1100
+
+    autotest: flake8 compliance for arduplane.py
+
+[33mcommit 78aa729b9027fa66505fd8ca049a3cf610523816[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Feb 12 11:44:35 2021 +1100
+
+    autotest: flake8 compliance for common.py
+
+[33mcommit d183d4c91beac7b1ac0273cff658a4a19924d2f5[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 17 10:33:19 2021 +1100
+
+    .flake8: ignore E221 multiple spaces before operator
+
+[33mcommit 4d33e7dc809e13049704ee64e2c520df61c0d7e3[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 17 10:36:25 2021 +1100
+
+    .flake8: ignore E203 whitespace before ':'
+
+[33mcommit a45d4e93be7fd21235dbab8ff29230594515d89c[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Feb 12 09:57:04 2021 +1100
+
+    .flake8: ignore 'W504 line break after binary operator'
+
+[33mcommit 4c56ac7eb33426040abad7f995810d77c1b556d4[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Feb 12 09:47:10 2021 +1100
+
+    autotest: flake8 compliance for antennatracker.py
+
+[33mcommit 726f54e37f099982795229a0a73c43a04b3b55d1[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Feb 12 09:45:48 2021 +1100
+
+    autotest: flake8 compliance for rover.py
+
+[33mcommit 0a235cc0d154c7efaa76c7490fce5090b0077c3d[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Feb 11 10:52:04 2021 +1100
+
+    .github: run Python cleanliness checks
+
+[33mcommit 360e2f49b33e0ed626afb262095ff108f05f7dfa[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Feb 11 10:47:43 2021 +1100
+
+    Tools: git-tools: add a script suitable for use as a pre-commit hook
+
+[33mcommit e3887c8d9388f19f3e14d7622b6539b95eac4907[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Feb 11 10:35:25 2021 +1100
+
+    autotest: make and mark autotest.py flake8-clean
+
+[33mcommit 3c83d52e52a79ff311dff54ceb2a3118990923ae[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Feb 11 10:34:53 2021 +1100
+
+    Tools: add script to check Python files for flake8-cleanliness
+
+[33mcommit 8019cc160a87d2b90036e712b079717e258db8bd[m
+Author: Tom Pittenger <tom.pittenger@krausaerospace.com>
+Date:   Wed Jan 27 15:19:48 2021 -0800
+
+    AP_ICEngine: make it obvious that update_idle_gov does nothing if disabled
+
+[33mcommit f124cf0991ea56b9b51e62ade9edb07e68b002cf[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Sat Apr 11 10:04:58 2020 +1000
+
+    AP_Hott_Telem: use GPS single-char representation of fix type
+
+[33mcommit 9da9d8c94b0e6bcb98d83b26d1af194d8eedc9c8[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Sat Apr 11 10:04:06 2020 +1000
+
+    AP_GPS: provide method for getting single char representing fix type
+    
+    Should allow us to be consistent across places in the code base that
+    need a compact representation for a user display.
+
+[33mcommit e788d6368682ddb03a945ea2904ccc1bc44dff01[m
+Author: Leonard Hall <leonardthall@gmail.com>
+Date:   Sat Feb 13 19:45:45 2021 +1030
+
+    AC_AttitudeControl: clear up comment for inertial_frame_reset
+
+[33mcommit 4c2cbdab8da687f286d3b539d49bbb3b8bb56214[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Sun Jan 31 16:13:34 2021 +0000
+
+    AP_HAL_ChibiOS: only setup half-duplex for receive when transmit is fully over
+
+[33mcommit 5c32007cdf9193f3004778b2857d95607b7bf8da[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Sat Oct 10 21:22:58 2020 +0100
+
+    AP_HAL_ChibiOS: ensure stop bits can be set before UART begin
+
+[33mcommit bd8619a61649a65c3dd31d97fa83fc745ea7d84a[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Fri Feb 12 19:25:44 2021 +0000
+
+    gitignore: add scripting repl
+
+[33mcommit 43763091bdee10706a3ae3fde1031f1e0d3a8ad1[m
+Author: Peter Hall <33176108+IamPete1@users.noreply.github.com>
+Date:   Sat Mar 7 12:59:28 2020 +0000
+
+    AP_Scripting: add send_named_float to simple loop example
+
+[33mcommit fc95664580b802b32f1b4613a843ea5d3a67a6b7[m
+Author: Peter Hall <33176108+IamPete1@users.noreply.github.com>
+Date:   Sat Mar 7 12:58:28 2020 +0000
+
+    AP_Scripting: add GCS send_named_float binding
+
+[33mcommit 3371c272fb309b4e19162fe71d17d5e90c55183a[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Tue Feb 16 16:58:56 2021 +0000
+
+    AP_Notify: make LED_NTF_LEN changes require a reboot
+    
+    don't dynamically update LED length
+
+[33mcommit 3a9107245c7d1defff86bc9be4a8d9712c12f81e[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Sat Feb 6 17:59:04 2021 +0000
+
+    AP_HAL_ChibiOS: allocate DMA and LED buffers correctly when the length changes
+    
+    calculate DMAR pulse times correctly
+    ensure 50us pulse separation for LED
+    make sure the LEDs are signalled for output
+    only allow LED length to be set once
+
+[33mcommit a98f85502acf4c9694371b873d36632348d12fb3[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Fri Jan 29 19:54:26 2021 +0000
+
+    AP_RCTelemetry: add support for SmartAudio protocol.
+    
+    treat VTX frequency as a first class citizen, match band/channel to frequency
+    update CRSF to use new VTX configuration
+    use a 6-position switch to control VTX power
+    add support for VTX GCS announcement
+    announce VTX updates on CRSF
+    support pitmode-until-arm and pitmode-on-disarm
+    
+    Co-authored-by: luis.martinez.exts <luis.martinez@juntadeandalucia.es>
+
+[33mcommit ea3af39773b74b2d7e0cdc6d4fbe59b36504b06f[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Sun Feb 7 13:20:55 2021 +0000
+
+    RC_Channel: add support for 6-position switch and use it for VTX power
+
+[33mcommit 6f91e053d529d38abe094b8d7b2e9da4d22686c1[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Fri Jan 29 19:52:10 2021 +0000
+
+    AP_VideoTX: new library to support the SmartAudio protocol
+    
+    set the VTX parameters to what was actually configured by the VTX
+    use change band/change frequency when appropriate
+    set power levels appropriately for protocol version.
+    
+    Co-authored-by: luis.martinez.exts <luis.martinez@juntadeandalucia.es>
+
+[33mcommit 7aa1e2d63bf77f67b22cf702973eb8d48e1a6d38[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Fri Jan 29 19:57:21 2021 +0000
+
+    waf: add AP_VideoTX module
+
+[33mcommit 2d0fe8b88319c1ee74bdb045a119f694614a8658[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Fri Jan 29 19:56:47 2021 +0000
+
+    AP_SerialManager: add support for the SmartAudio protocol
+    
+    Co-authored-by: luis.martinez.exts <luis.martinez@juntadeandalucia.es>
+
+[33mcommit b79ff9475d201a4a9ac99f3b5d8854e02a6d2e66[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Fri Jan 29 19:55:49 2021 +0000
+
+    AP_Vehicle: add support for the SmartAudio protocol
+    
+    Co-authored-by: luis.martinez.exts <luis.martinez@juntadeandalucia.es>
+
+[33mcommit 33fee211a41973f3a056a9028c5e94966b62fe76[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 17 12:58:21 2021 +1100
+
+    autotest: extend pexpect timeouts when running under Valgrind
+
+[33mcommit a292fe1b8be5b91978ea3f8d3b6f81c22936d7b9[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 17 12:53:13 2021 +1100
+
+    autotest: use wait_statustext rather than mavproxy.expect
+    
+    This is important when running under Valgrind as the text can be
+    significantly delayed.  wait_statustext times out in simulation time,
+    whereas mavproxy.expect has a flat 60s timeout
+
+[33mcommit c20c4a6308816c46d7ccffd35bd21cdef460f6b8[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 17 12:20:07 2021 +1100
+
+    AP_HAL_SITL: set bus in read-size of rdwr transaction
+
+[33mcommit c00a82868e415638bcf826c8e4ec89d763921918[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 17 12:18:21 2021 +1100
+
+    autotest: make DLVR sole airspeed sensor in test
+    
+    The test wasn't actually *using* the DLVR...
+
+[33mcommit dbdda659565d84bd33797a667c9cfb14f43167f8[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 17 10:19:37 2021 +1100
+
+    autotest: add basic test for GPS blending
+
+[33mcommit 1c4e1aab0581cc16262cff5dbc8a7f436201dad9[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 10 10:08:38 2021 +1100
+
+    AP_Logger: move gps logging structures into AP_GPS
+
+[33mcommit c2cba52ad8051b7dd2ca4ebf4ab30e2372eb6eb7[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 10 10:08:37 2021 +1100
+
+    AP_GPS: move gps logging structures into AP_GPS
+
+[33mcommit 82a84c8f35395b44cccbc072f1101f994f14ffff[m
+Author: SSGrady <gradystevena@gmail.com>
+Date:   Tue Feb 16 10:05:26 2021 -0500
+
+    Tools: added name to GIT_Success.txt
+
+[33mcommit 94c4b2d7698d3780135241c1cb5e561e5174a332[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 10 23:30:44 2021 +1100
+
+    mavlink: update to ardupilot master commit
+
+[33mcommit 1ca0998f32f43c0b9a26a0dc653024d7d5eff815[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Sat Jul 4 09:03:18 2020 +1000
+
+    Tools: take MAV_CMD_DO_SPRAYER as a mavlink command
+
+[33mcommit eefcc92f24995a71e0d51506ea48acbbe309917f[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Sat Jul 4 08:46:43 2020 +1000
+
+    GCS_MAVLink: take MAV_CMD_DO_SPRAYER as a mavlink command
+
+[33mcommit b14dcf4baeae802f713791e72f31e0fe2b4940e7[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Jul 3 09:04:28 2020 +1000
+
+    Tools: add mission command to turn sprayer on and off
+
+[33mcommit c3b005e1d9b4759352122f7f0fabd26a1dad219b[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Jul 3 09:04:27 2020 +1000
+
+    AP_Mission: add mission command to turn sprayer on and off
+
+[33mcommit 98287a1b2fb98a0670d914db11be56e44a751e63[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Thu Feb 11 17:35:52 2021 +0530
+
+    AC_Avoid: Use previous avoidance vel for limiting accel
+
+[33mcommit cbf57af1f324fb08ece3c542409611067bc9bbe5[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Tue Feb 9 23:27:55 2021 +0530
+
+    AC_Avoid: Limit acceleration while simple avoidance is active
+
+[33mcommit 865f3cda79fa2c563f3b37787ab596783a895826[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Tue Feb 9 23:27:23 2021 +0530
+
+    AC_Avoid: Add param to switch off proximity avoidance based on alt
+
+[33mcommit fdd39ca3a85e7896e2c800861f41c32809f526dc[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Tue Feb 9 23:26:15 2021 +0530
+
+    Copter: Check for height before turning on proximity simple avoidance
+
+[33mcommit be8f747b7a471b99336c8e49ce0393710e3fe162[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Sat Feb 13 19:29:20 2021 +1100
+
+    autotest: adjust timeout for Valgrind; disable for gdb
+
+[33mcommit c1a831bbf49fda1013ad046b60baa2e0c185c75d[m
+Author: Peter Hall <iampete@hotmail.co.uk>
+Date:   Sat Feb 13 00:26:15 2021 +0000
+
+    GCS_MAVLink: sensor flags, only mark AHRS as enabled once initialised
+
+[33mcommit 2302f08f753f1b4a5ecc38a413296f85559390c1[m
+Author: Dr.-Ing. Amilcar do Carmo Lucas <amilcar.lucas@iav.de>
+Date:   Fri Feb 5 10:55:45 2021 +0100
+
+    Copter: run the "point yaw to ROI" controller at full rate (400Hz) instead of 1/4 of full rate (100Hz)
+    
+     - This should improve pointing at ROI and replaces #11172
+     - Remove unused member variable as per review suggestion
+     - declare Mode::AutoYaw::roi_yaw() as const
+
+[33mcommit a42bfd5df55ae251011e874438e62fe22494a1af[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sun Feb 7 08:31:32 2021 +1100
+
+    AP_Baro: added MS5611 baro compensation for -15 to -40C
+
+[33mcommit 4c4e613f6a175e79d8ed1299786146ac16492763[m
+Author: Michael du Breuil <wicked.shell.scripts@gmail.com>
+Date:   Mon Feb 15 13:00:09 2021 -0700
+
+    AP_GPS: Don't send SBF config unless there is free space in the port
+
+[33mcommit c0da87c066489107f61bab414886add3c3104b31[m
+Author: Michael du Breuil <wicked.shell.scripts@gmail.com>
+Date:   Thu Feb 11 16:15:12 2021 -0700
+
+    AP_HAL_ChibiOS: Update HitecMosaic to reflect changes to GPS config
+
+[33mcommit 4d42996068847f59a838e3e474259704594b760d[m
+Author: Michael du Breuil <wicked.shell.scripts@gmail.com>
+Date:   Thu Feb 11 16:14:37 2021 -0700
+
+    AP_GPS: Force the buadrate on SBF units
+
+[33mcommit 01eb64ce73ff3c03bc2ce9971ff36df4b1ee44c2[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Mon Feb 15 08:51:28 2021 +1100
+
+    AP_RPM: don't present RPM2_PIN parameter if RPM_MAX_INSTANCES <=1
+
+[33mcommit 97c1445bce447488eee42f53b8976ef0d50a368b[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Thu Jan 28 09:23:47 2021 +0900
+
+    Copter: ensure send_position_target_global_int alt always absolute
+
+[33mcommit ea0efd3a1a8788ac8dc341db02da7e7aacb39812[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Mon Feb 15 11:45:01 2021 +1100
+
+    Copter: correct documentation of use of DO_CHANGE_SPEED parameter
+
+[33mcommit 6d1511f3eb2197fcc128fdfd3454f63f6ced2e33[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Feb 11 11:49:43 2021 +1100
+
+    GCS_MAVLink: added method to force save calibration
+    
+    useful after reloading parameters
+
+[33mcommit f8e0227c8c6ce46cafc35da1d63202e05cc69685[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Feb 11 11:49:21 2021 +1100
+
+    AP_Compass: added force_save_calibration()
+
+[33mcommit 25dd08a1fdc68183f1f300f1f70d829ff9a7a134[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Feb 11 11:49:08 2021 +1100
+
+    AP_InertialSensor: added force_save_calibration()
+
+[33mcommit 9de15199286d77514c8853b8d32c326418c64f5b[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Feb 11 09:11:44 2021 +1100
+
+    HAL_ChibiOS: prevent hw flow control from hogging a DMA channel
+    
+    When hw flow control is enabled check the CTS pin before we grab the
+    DMA channel to prevent a long timeout trying to send to a blocked port
+    from holding a DMA channel against another device
+    
+    this fixes issue #16587
+
+[33mcommit ee8e9e3289db8d3ed348531f36893f0268cb2eac[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Feb 13 12:58:40 2021 +1100
+
+    waf: fixed handling of vehicle dependency check for abs paths
+    
+    this fixes the use of vehicle dependent cpp files on the build server
+
+[33mcommit 3c3db5084353cde2ebaa1c2f21d30584b3886682[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Mon Feb 8 09:50:18 2021 +1100
+
+    Vagrant: augment bash when working in a git repository
+    
+    This .bashrc_git originally came from tridge.
+
+[33mcommit 1b74058842954e7257c6475f21042be2102fe768[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 10 12:16:43 2021 +1100
+
+    Plane: recalculate glide slope after achieving rtl.done_climb
+
+[33mcommit ca49f62b6d0e787f14d3a2b36957f18b0e7fdb96[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Tue Feb 9 13:24:09 2021 +1100
+
+    autotest: add test for Plane's RTL_CLIMB_MIN parameter
+
+[33mcommit e4d5a9272101d38e1fb92357f03e5390b8e0336c[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 10 12:51:46 2021 +1100
+
+    autotest: add wait_distance_to_nav_target method
+
+[33mcommit d60fa86026fafcc72c219bdd96304a48d5280dfe[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Sat Feb 13 18:46:29 2021 +1100
+
+    autotest: use set_map_from_rc more
+
+[33mcommit 106162b0c51699eb27be900b0e19e87ada6b4cbb[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Feb 13 16:48:44 2021 +1100
+
+    AP_MSP: removed date/time from MSP
+    
+    we don't want to use real dates here as that would mean we don't get
+    consistent builds. Being able to reproduce the exact build at a later
+    date is a valuable property of the code
+    
+    The git hash should be enough
+
+[33mcommit 0cc44098451b87275958ad203826499e590826b4[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Feb 13 09:36:04 2021 +1100
+
+    HAL_ChibiOS: fixed handling of invalid channel for LED write
+    
+    this prevents a null ptr dereference when an invalid channel (such as
+    one on IOMCU) is used for LEDs
+
+[33mcommit 098a17fe2e2f8de73a1fbc8013a09093b61f6f2f[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Feb 13 09:37:32 2021 +1100
+
+    HAL_ChibiOS: fixed CubeOrange ADSB param name
+
+[33mcommit f107ce395190f25e4189a163c2bdccefa73262b5[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Thu Feb 11 13:07:51 2021 +0530
+
+    AP_Proximity: Use 3 sectors for simple avoidance boundary
+
+[33mcommit 8cab737bddb3b95020ff13ffcd1a64fe3768faf8[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Thu Feb 11 13:06:58 2021 +0530
+
+    AP_Proximity: Follow NED convention
+
+[33mcommit 74bda4952dec9f19d1501288132966ff7e2bea91[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Thu Feb 11 13:06:18 2021 +0530
+
+    AC_Avoid: Return early if velocity is unchanged in proximity avoidance
+
+[33mcommit a5706a18af4f75c6db2ea7383771d67751b5b522[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Feb 12 15:13:47 2021 +1100
+
+    autotest: handle Py2 not having ConnectionResetError built in
+
+[33mcommit 50d80e9dc4f6c2cc4c2ed78339ba4eb6132d849d[m
+Author: Michael du Breuil <wicked.shell.scripts@gmail.com>
+Date:   Thu Feb 11 15:18:24 2021 -0700
+
+    AP_Periph: Remove debug printf
+
+[33mcommit 840bdbba62e920a070bc1ae4d39a5a3e5cb93124[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Tue Feb 9 12:36:19 2021 +1100
+
+    Sub: show frame class as part of banner
+    
+    Similar to how Copter does in its equivalent method.
+    
+    frame type is not used on Sub ATM
+
+[33mcommit 85a8536243127e64e74415291e94318d0add0b58[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Thu Feb 11 17:41:25 2021 +0000
+
+    Copter: All men dream, but not equally.
+    Those who dream by night in the dusty recesses of their minds, wake in the day to find that it was vanity:
+    but the dreamers of the day are dangerous men, for they may act on their dreams with open eyes,
+    to make them possible.
+
+[33mcommit e5844b775365641c4b4e17935ba6f531fb3789a3[m
+Author: Willian Galvani <williangalvani@gmail.com>
+Date:   Thu Jan 14 16:08:49 2021 -0300
+
+    Frame_params: Sub: make RNGFND1_TYPE 0 (None)
+    
+    This was causing issues in QGC 4.1 as it was showing an unhealthy
+    Rangefinder and marking the vehicle as "not ready to fly".
+    It will be up to the companion computer to set this to 10(Mavlink)
+
+[33mcommit e448910ff0f03edbef8a61bbb96c7c2772ccd4a1[m
+Author: Willian Galvani <williangalvani@gmail.com>
+Date:   Thu Jan 14 15:58:54 2021 -0300
+
+    Sub: don't override default RNGFND1_TYPE
+    
+    This is causing side-effects in QGC 4.1, as it reports the Range-
+    finder to be in bad health, which causes qgc to show "not ready to
+    fly" instead of "ready to fly" which might confuse users
+
+[33mcommit 5e3caefc2d3b60cf5eefe27429406ca385190670[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 10 13:51:00 2021 +1100
+
+    Vagrant: make ptrace permissive to allow stack dumping
+
+[33mcommit eafd702773517bede1a3a61824046f6ceab26074[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Wed Jan 27 21:38:43 2021 +0900
+
+    AC_WPNav: add comment clarifying get_wp_destination alt frame
+
+[33mcommit 4020308d40bd490daa77620add6b13fc81b25de2[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 10 14:09:01 2021 +1100
+
+    Vagrant: add desktop to Vagrant
+
+[33mcommit 904b49380947c5de20ecb2ee669a7b1645b3b088[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Wed Feb 10 18:58:16 2021 +0000
+
+    Tools: autotest, common.py remove extra comma
+
+[33mcommit bb15c18cc32f6b4d03ee0c23cca501a29d8e7325[m
+Author: Mark Whitehorn <kd0aij@gmail.com>
+Date:   Mon Sep 28 23:59:38 2020 -0600
+
+    GCS_MAVLink: send message when MAVFTP init fails
+
+[33mcommit eb78a473f673d6221d9d265e3d43186b25fd64de[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Tue Feb 9 18:08:10 2021 +0100
+
+    AP_Vehicle: correct virtual specifier
+
+[33mcommit 8396388af915c4028c87d428578550153c036314[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Tue Feb 9 13:56:47 2021 +0100
+
+    Tools: run_examples: add FlashTest to skip list
+
+[33mcommit 6062e4ee81e46a30bf4c26e5ab1b6db05cb79b9f[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Wed Feb 3 18:21:39 2021 +0100
+
+    ArduPlane: use AUX_PWM_TRIGGER_LOW and AUX_PWM_TRIGGER_HIGH
+
+[33mcommit 7430a415fb9ccde69f74dbd3509615dd4b125896[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Wed Feb 3 18:21:39 2021 +0100
+
+    AP_Tuning: use AUX_PWM_TRIGGER_LOW and AUX_PWM_TRIGGER_HIGH
+
+[33mcommit 67bdec3325869f811c803ee7e8baa6a69d735dca[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Wed Feb 3 18:21:39 2021 +0100
+
+    AP_OSD: use AUX_PWM_TRIGGER_LOW and AUX_PWM_TRIGGER_HIGH
+
+[33mcommit 9362039feb251865a8b2049c40f49ac089390538[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Wed Feb 3 18:21:39 2021 +0100
+
+    AP_ICEngine: use AUX_PWM_TRIGGER_LOW and AUX_PWM_TRIGGER_HIGH
+
+[33mcommit 287645cf68747cb76cd6711905e0f62e5c7eac53[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Wed Feb 3 18:21:39 2021 +0100
+
+    RC_Channel: use AUX_PWM_TRIGGER_LOW and AUX_PWM_TRIGGER_HIGH
+
+[33mcommit a631ca4eac9d9f2dbdc7da569f26a0f54bf04db2[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Wed Feb 3 18:21:28 2021 +0100
+
+    AP_Button: add AUX_SWITCH_PWM_TRIGGER_LOW and AUX_SWITCH_PWM_TRIGGER_HIGH
+
+[33mcommit 0725cbdffc70227efb14e7979642641f2fa2c181[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Wed Feb 3 18:21:28 2021 +0100
+
+    RC_Channel: add AUX_SWITCH_PWM_TRIGGER_LOW and AUX_SWITCH_PWM_TRIGGER_HIGH
+
+[33mcommit 68a27e3b418ed8f3910c2752b1fbf88818ec970c[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Wed Feb 3 15:35:57 2021 +0100
+
+    AP_Arming: use RC_CALIB_MIN_LIMIT_PWM and RC_CALIB_MAX_LIMIT_PWM
+
+[33mcommit c0348b034fde8c34d416e4f1d0bc2c014a33adcd[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Wed Feb 3 15:22:56 2021 +0100
+
+    Rover: use RC_CALIB_MIN_LIMIT_PWM and RC_CALIB_MAX_LIMIT_PWM
+
+[33mcommit 9dcaf155a67348e3ca0f9399e776a602d92432e4[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Thu Apr 2 16:33:23 2020 +0200
+
+    RC_Channel: add use RC_CALIB_MIN_LIMIT_PWM and RC_CALIB_MAX_LIMIT_PWM
+
+[33mcommit 1ee7f00192520bf2e17bf05af9bfc6ddecadda5b[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Thu Feb 4 20:37:06 2021 +0900
+
+    AP_VisualOdom: fix T265 criteria for aligning to AHRS
+
+[33mcommit f53242b32391ef1cafe04481b7d98793d3185269[m
+Author: Leonard Hall <leonardthall@gmail.com>
+Date:   Wed Feb 10 09:30:13 2021 +0900
+
+    AC_AttitudeControl: rename thrust_heading_rotation_angles args
+
+[33mcommit ad6e2eeed838e734fba5c946874e2bd2ef3ad1ed[m
+Author: Leonard Hall <leonardthall@gmail.com>
+Date:   Fri May 22 19:07:24 2020 +0930
+
+    AC_AttitudeControl: remove feed-forward from run_quat
+
+[33mcommit 20d8696a0a68d4b7492e0428a0162211ef8370e2[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Tue Feb 9 08:03:33 2021 +0000
+
+    AP_HAL_ChibiOS: BeastH7 has DPS310 baro
+
+[33mcommit 8ace1bfad1d15ce374dd3e1eabde553425fe3f68[m
+Author: Leonard Hall <leonardthall@gmail.com>
+Date:   Wed Feb 10 11:38:47 2021 +0900
+
+    AC_PosControl: const local vars and remove todo
+
+[33mcommit 6d650e74f2fdcdbbb63afdfec651d87779cda6f8[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Mon Feb 8 19:10:44 2021 +0000
+
+    AP_Scripting: add fault tolerant hex MotorsMatrix example
+
+[33mcommit 4324d66c138f2fe5d6deb87e5747941c56416b2f[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Tue Feb 9 14:33:55 2021 +1100
+
+    autotest: loosen time constraint on mavlink messages in magcal
+    
+    Saw an error where we didn't get one of these in 5 seconds.
+    
+    That sounds like too much.  But we'll loosen the constrain anyway
+
+[33mcommit bd8384b32244fddb071e6f3b313252607010de61[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Tue Feb 9 13:24:24 2021 +1100
+
+    autotest: break out a get_altitude method
+
+[33mcommit e2aaf4c216f8ffa5eb5bf4587e560e6fc23a140b[m
+Author: Alessandro Apostoli <30294218+yaapu@users.noreply.github.com>
+Date:   Tue Feb 9 10:56:28 2021 +0100
+
+    Tools: autotest, fix for frsky not defined error (#4)
+
+[33mcommit d9dd93bcdd273fa9bf054296d2c14cb532a29b42[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Tue Feb 9 20:08:36 2021 +1100
+
+    autotest: don't run frsky tests armed for the most part
+
+[33mcommit 617ee37392691dee61ebc1a7efe88cbe614a7d5a[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Thu Jan 14 09:51:48 2021 +0100
+
+    .github: run test in privilege container to allow PTRACE
+
+[33mcommit f4e6d63a7c6db7a7db861ba84f1e2d63e3880272[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Tue Feb 9 20:15:45 2021 +0900
+
+    AP_VisualOdom: minor formatting fixes
+
+[33mcommit d928b80629eb9cab6598b3b55a702409081823fc[m
+Author: Gone4Dirt <matthewnkear@gmail.com>
+Date:   Tue Feb 9 08:59:57 2021 +0000
+
+    AP_SmartRTL: Add option to ignore pilot yaw
+
+[33mcommit 1e1be590e257df1485095bdfbec165bce06578dd[m
+Author: Gone4Dirt <matthewnkear@gmail.com>
+Date:   Tue Feb 9 08:56:12 2021 +0000
+
+    Copter: Add ignore pilot yaw option bit
+
+[33mcommit 0703a1cf9392929e6818fd8c50cda19d5d4c5801[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Fri Jan 29 13:43:43 2021 +0900
+
+    AC_PosControl: add PSCZ logging
+
+[33mcommit 9f914d9e7d26f6ee956bfd3900532f3d0322677a[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Fri Jan 29 13:43:26 2021 +0900
+
+    AC_PosControl: add get_z_accel_cmss helper function
+
+[33mcommit 3ae8af6b217540cca450a5712ff6f8e3c166d8d0[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Fri Jan 29 13:42:26 2021 +0900
+
+    AP_Logger: add PSCZ logging
+    
+    Co-authored-by: Peter Barker <pb-gh@barker.dropbear.id.au>
+    
+    includes const log_PSCZ declaration
+    also changed PSZ ThO to percentage
+
+[33mcommit 8135d9e60a134f99753f323affb8952ea7496666[m
+Author: Josh Henderson <hendjoshsr71@gmail.com>
+Date:   Fri Jan 22 13:30:14 2021 -0500
+
+    AP_VisualOdom: Privatize Logging
+
+[33mcommit 00e3bda2f51e9b866cc85c20643c39b7de83d467[m
+Author: Josh Henderson <hendjoshsr71@gmail.com>
+Date:   Tue Feb 2 21:12:58 2021 -0500
+
+    AP_Logger: Privatize AP_VisualOdom Logging
+
+[33mcommit 9ace8ed216b5a9754f39ba3e3de9a64fa2495651[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Feb 9 01:55:16 2021 +0000
+
+    AP_Motors: Matrix 6DoF scripting add get_frame_string
+
+[33mcommit 7d5e5f8dd7dbabe556fb37cc096b032410d6d65c[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Feb 9 01:40:15 2021 +0000
+
+    AC_AttitudeControl: add SITL panic to remind us to implent the quarternion
+
+[33mcommit a572820dbceb0ec9e6c386bd25fc289f5365db6c[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Fri Feb 5 12:23:20 2021 +0000
+
+    Copter: system: use config_error loop don't panic
+
+[33mcommit cc26a520bcbfb340dd05d7e894f5b9fea5f780e6[m
+Author: Peter Hall <iampete@hotmail.co.uk>
+Date:   Tue Jan 26 19:03:53 2021 +0000
+
+    AP_MotorsMatrix: init to virtual and remove duplicate set initalised
+
+[33mcommit 1395f9ce79fa8eecd4a28dd9f240dc881ad3c460[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Jan 26 13:03:20 2021 +0000
+
+    AP_Scripting: add 6DoF motors matrix bindings and example
+
+[33mcommit 28e8c5e56e4bb21818ac01300938b18d85d09bd0[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Jan 26 13:02:38 2021 +0000
+
+    AP_Scripting: add 6DoF attitude control bindings and example
+
+[33mcommit 5c3725d89981d534df6397bacef6a2a0e8aef5d1[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Jan 26 13:01:02 2021 +0000
+
+    AP_Motors: add 6DoF scripting matrix mixer
+
+[33mcommit 791e68b4ef8406a9d5439e411bb30e8c0cf59c1f[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Jan 26 12:54:13 2021 +0000
+
+    AC_AttitudeControl: add 6DoF support
+
+[33mcommit d6fa4d97e34d5c2cfd6a2717c660ec04080aa404[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Jan 26 12:53:34 2021 +0000
+
+    Copter: add 6DoF support
+
+[33mcommit f490c9d79955f9f148030f9c6a77888500d5ed9b[m
+Author: Gone4Dirt <matthewnkear@gmail.com>
+Date:   Mon Feb 8 17:26:26 2021 +0000
+
+    AC_Autorotation: Add copter vehicle type to flight log metadata
+
+[33mcommit 6dc100728f891cd31343e94e1d678b12e9e710e0[m
+Author: Gone4Dirt <matthewnkear@gmail.com>
+Date:   Mon Feb 8 17:21:02 2021 +0000
+
+    AP_Motors: Fix spelling of autorotation flag
+
+[33mcommit 030b6f2a492bc0171df422a85bf5898d7a4d0da7[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Wed Feb 3 11:04:38 2021 -0300
+
+    Rover: Simplify boolean expression
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit ffe356d59704ef50376e9bc6b1229498d6c7a55e[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Wed Feb 3 11:04:38 2021 -0300
+
+    ArduCopter: Simplify boolean expression
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 9bc8a8c9128f003fa17a929415ea9da0baf08e2f[m
+Author: Mark Whitehorn <kd0aij@gmail.com>
+Date:   Wed Dec 9 09:41:22 2020 -0700
+
+    AP_Motors: make frame*string getters more const
+
+[33mcommit 236961f17f4168a44dc99caa9185a341253bc30a[m
+Author: Mark Whitehorn <kd0aij@gmail.com>
+Date:   Fri Nov 6 07:09:23 2020 -0700
+
+    Plane: use get_frame_class/type string methods
+    
+    use AP_Enum<> for frame_class/type
+    remove invalid copterTS check
+    improve quadplane setup failure message
+    
+    Co-authored-by: Peter Barker <pb-gh@barker.dropbear.id.au>
+
+[33mcommit f405454abad6f1cef89cca270d816ceea05fad35[m
+Author: Mark Whitehorn <kd0aij@gmail.com>
+Date:   Sun Dec 6 20:46:09 2020 -0700
+
+    Copter: add nullptr checks for get_frame_string
+    
+    fix rebase errors
+
+[33mcommit cb687a6fffccbd986facaf3d856978a96b1f1215[m
+Author: Mark Whitehorn <kd0aij@gmail.com>
+Date:   Thu Nov 5 13:00:12 2020 -0700
+
+    Copter: move get_frame_string to Motors class
+
+[33mcommit 6b2184a53affdac363f64f9bd30a99cd81c1ed3d[m
+Author: Mark Whitehorn <kd0aij@gmail.com>
+Date:   Thu Nov 5 12:59:35 2020 -0700
+
+    AP_Motors: add frame_class and frame_type strings
+    
+    move frame_class/type string assignments down into subclasses
+
+[33mcommit 814393c9c2f075f6880ae7f49a2ddfdde21eca5a[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jul 9 18:15:37 2020 +1000
+
+    HAL_ChibiOS: switch from DPS280 to DPS310 in boards that use the DPS310
+
+[33mcommit dad55b496b9077b882f6653e8e55ec808fac05d8[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jul 9 18:15:14 2020 +1000
+
+    AP_Baro: support DPS310 temperature fix
+    
+    separate DPS310 from DSP280
+
+[33mcommit 1814524fcb4bdcf81c256400c6ecc3cc4e62af29[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Jan 25 19:51:52 2021 +0900
+
+    AP_NavEKF3: fix using_external_yaw when using external nav
+    
+    the first if would always return true meaning the method would always return false when using external nav
+    thanks to David Sastre for finding this!
+
+[33mcommit 86fda937811dd11147c9d901f165273cffceb1b6[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Feb 8 14:45:32 2021 +1100
+
+    HAL_ChibiOS: added heater correction of AK09916
+    
+    this fixes a problem with the internal compass being impacted by the
+    magnetic field from the heater
+
+[33mcommit a90b54ba6e6f09569962607720e762e7aa57a464[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Feb 8 14:44:55 2021 +1100
+
+    AP_Compass: allow for AK09916 correction by heater duty cycle
+
+[33mcommit 1097d04e5db08cf3db4492087c54f478735c334a[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Feb 8 14:43:57 2021 +1100
+
+    AP_BoardConfig: added get_heater_duty_cycle()
+
+[33mcommit 5920c52285fff7be99d2b71a769a6070fa5a7ac1[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Feb 8 11:33:21 2021 +1100
+
+    Scripting: simple relay example
+    
+    toggle at 50Hz
+
+[33mcommit 55de28c0fd4ae2f7bdc744366a5d96c3a45c6c03[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Feb 8 16:27:36 2021 +1100
+
+    CI: added upload of failed builds
+
+[33mcommit db8aaeb63a557d5c0dc59620fe9105617ce71318[m
+Author: Samuel Tabor <samuel.tabor@krausaerospace.com>
+Date:   Thu Nov 7 13:58:55 2019 -0500
+
+    Plane: During takeoff keep limit at LEVEL_ROLL_LIMIT until rotate speed is reached.
+
+[33mcommit 2ab8ad0ef07420bd1354e8341f7288ac6570c6c6[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Feb 8 10:39:31 2021 +1100
+
+    HAL_ChibiOS: added Durandal pinout details
+
+[33mcommit 742d5a9fa00e7599993dcf5ed094db4b8a6ab4fa[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Mon Feb 8 20:33:09 2021 +1100
+
+    autotest: add body_frame_velocity
+
+[33mcommit 3609a1b5fdabc7cc922542627218b2311caa6065[m
+Author: Arsh <arshpratapofficial@gmail.com>
+Date:   Fri Feb 5 21:40:47 2021 +0530
+
+    Copter:PreArm Battery low voltage failsafe message repeated two times fix
+
+[33mcommit 164da261f10f0f6559330cf1d2dba875dd757eea[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Sun Feb 7 08:20:57 2021 +1100
+
+    Tools: initvagrant: install missing cmake so we can build jsbsim
+
+[33mcommit a70f9d54c07f0fac9ace2c501452cfc612585a4a[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Feb 6 19:09:31 2021 +1100
+
+    Copter: update release notes for 4.0.7rc1
+
+[33mcommit d1dda86f60060bc752ae4bb6521b2794a65959f0[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Feb 1 11:14:01 2021 +0900
+
+    AC_AutoTune: report step in lower case
+    
+    also shortens displayed accuracy to 0.1deg and removes one pair of brackets
+    we should use lower case for reporting because it is easier to read and it takes up less space when displayed on MP's HUD (and probably other GCSs too)
+
+[33mcommit 25beab4c82a31d061ebe862e49b669006943c257[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Feb 1 11:41:27 2021 +0900
+
+    AC_AutoTune: add failure to level warning
+
+[33mcommit 4032ac988440b5918fde8dd97fa78c371a1ac322[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Feb 1 10:07:12 2021 +0900
+
+    AC_AutoTune: level criteria is 5deg for plane and 2.5 for all others
+
+[33mcommit 2e9b2fbc2bb87e06fce05f4fc87687858e7df7dd[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Feb 6 15:43:35 2021 +1100
+
+    Plane: update release notes for 4.0.9beta1
+
+[33mcommit 623951a2627c975ceafc4a36498bed1284d8f3db[m
+Author: Michael du Breuil <wicked.shell.scripts@gmail.com>
+Date:   Fri Jan 22 12:40:11 2021 -0700
+
+    AP_HAL_ChibiOS: Add some extra GPS SBF config
+
+[33mcommit 5f3b1b92a4f2a2306c86561922c61ae90eaefb87[m
+Author: Michael du Breuil <wicked.shell.scripts@gmail.com>
+Date:   Fri Jan 22 12:35:19 2021 -0700
+
+    AP_GPS: SBF don't send configuration until we've recieved a prompt
+    
+    This fixes a configuration problem with SBF unit's where sometimes we
+    fail to detect the GPS unit continously, until it's been manually
+    configured. This was tested by doing a hard reset to the GPS unit.
+    
+    This also now accepts a set of defines from the hwdef, or build
+    environment, which allows us to specify extra config options.
+
+[33mcommit d9ffd04a9661c925c3e0f80715cdcb7a7fe2eb3c[m
+Author: Michael du Breuil <wicked.shell.scripts@gmail.com>
+Date:   Fri Jan 22 12:34:21 2021 -0700
+
+    AP_GPS: Broadcast the detect message on AP_Periph over CAN
+
+[33mcommit b113fe15ab30946b1b5105d1f8bd6df9d35696e6[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Fri Feb 5 19:13:57 2021 +1100
+
+    Tools: added MatekH743-periph to autobuild
+
+[33mcommit a3c47e0a23e6b1d689ab79841db35ca7bb73374a[m
+Author: basti <tunella@gmx.de>
+Date:   Fri Feb 5 07:47:50 2021 +0100
+
+    AP_OSD: add SD-card handling to font README
+
+[33mcommit f20fc28a858d2e8ca7caefdcbab061f80f39390e[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Fri Feb 5 10:14:02 2021 +0900
+
+    Tools: param files to ease SITL setup of GPS-for-yaw
+
+[33mcommit 3da156e358326164ddf5bf77aa81387503ea9038[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Feb 5 13:28:53 2021 +1100
+
+    AP_InertialSensor: prevent nullptr dereference in SITL
+
+[33mcommit 6144136b6173bc561e6a43e5efb950f0405922f2[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Fri Feb 5 13:57:02 2021 +1100
+
+    Filter: fixed reset of filters to first value
+    
+    the delay elements were set incorrectly
+
+[33mcommit d1e6b0befbc82e108fb3b7fcb2945c2af0ac1629[m
+Author: Tom Pittenger <tom.pittenger@KrausAerospace.com>
+Date:   Thu Feb 4 15:22:41 2021 -0800
+
+    AP_HAL_ChibiOS: Add ADC1 support to STM32F3
+    
+    
+    
+    This is useful for AP_Periph battery monitoring
+
+[33mcommit 09f04e8a5aa0a712bd9708edc57f785bb79a0bc3[m
+Author: murata <ma2maru@gmail.com>
+Date:   Sat Feb 8 13:59:22 2020 +0900
+
+    AP_RangeFinder: Devices are enabled and disabled by type
+    
+    AP_RangeFinder: Devices are enabled and disabled by type
+    
+    AP_RangeFinder: Delete some description of I2C function address.
+
+[33mcommit b8e82a56f36949378e78b1051eb9b9596b94a918[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Feb 4 09:04:15 2021 +1100
+
+    HAL_ChibiOS: don't start rout ticks till after full system init
+    
+    this prevents an occasional boot hang on systems with DShot
+    enabled. We shouldn't be starting DShot output till after setup() is
+    complete as the outputs are still being configured
+
+[33mcommit a09bdcdda113d9397fdcc4ce7cd0b22578d03fbe[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Thu Feb 4 16:04:31 2021 +0900
+
+    Tools: default param file to ease using copter SITL with vicon
+
+[33mcommit f847758272ca64a941a594b803d5a49ea87904be[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Feb 4 15:33:09 2021 +1100
+
+    Filter: add gtest suite
+
+[33mcommit 514dfa4b7108ff0af7fcc6b6d4cc9de09161d96e[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Feb 4 15:48:04 2021 +1100
+
+    SITL: SF45B: increase resolution to 1 degree
+    
+    The mode filter tends to squish a lot of data if we don't get this
+    correct.
+
+[33mcommit 83417c1df7a211402e5bcab004370e3c5a0cae14[m
+Author: Tatsuya Yamaguchi <susumu-336@hotmail.co.jp>
+Date:   Thu Feb 4 14:02:31 2021 +0900
+
+    AP_Notify: modify NTF_BUZZ_VOLUME description
+
+[33mcommit ee2f615352d7782b5aeb3363479a5c51d99d1a9e[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Feb 4 12:47:35 2021 +1100
+
+    AP_Proximity: RPLidarA2: correct face distances are assigned to
+
+[33mcommit 567e9733b61683ec08548e1a584e301a6b22ef2d[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Mar 13 16:53:56 2019 +1100
+
+    autotest: augment bisect-helper.py to help with flapping tests
+    
+     - option to allow for a string which must be present in the outout
+     - option for strings which must not be present in the output
+     - repeat option so test must pass many times
+     - elaborate diagnostic output
+     - option to run under Valgrind (to provoke races)
+    
+    The output from each test run is poked into a directory in /tmp
+    
+    The number of runs a test took to fail is poked into a different file in /tmp, helping to tune the --autotest-test-passes parameter
+
+[33mcommit c2e310d75fb55bc29ddf09bb24ba100f438d8f73[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Sat Jan 9 11:57:49 2021 +1100
+
+    autotest: add test for OBSTACLE_DISTANCE_3D message
+
+[33mcommit 393ec5d6f79105eaf3a09968cda7b1bf966298a5[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Feb 4 10:59:02 2021 +1100
+
+    autotest: add test for MAVProxy proximity sensor
+
+[33mcommit acfe815305cd35c10c468a36ce0b57c006bdeee5[m
+Author: WillyZehnder <39805388+WillyZehnder@users.noreply.github.com>
+Date:   Thu Jan 28 16:45:14 2021 +0100
+
+    AP_Scripting: make get_control_mode_reason available to lua
+
+[33mcommit 84953c2e39b8ad918aa68f384ed8b2198d66317d[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 3 23:01:23 2021 +1100
+
+    AP_BattMonitor: fix constexpr-and-MIN don't get along bug
+    
+    lib/libArduCopter_libs.a(AP_BattMonitor_SMBus_NeoDesign.cpp.0.o): In function `AP_BattMonitor_SMBus_NeoDesign::timer()':
+    /home/pbarker/rc/ardupilot/build/sitl/../../libraries/AP_BattMonitor/AP_BattMonitor_SMBus_NeoDesign.cpp:27: undefined reference to `AP_BattMonitor_SMBus_NeoDesign::max_cell_count'
+    collect2: error: ld returned 1 exit status
+
+[33mcommit ba293084e3456df8cd3907d99e21e7e3ca019c40[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Wed Feb 3 11:13:58 2021 -0300
+
+    SITL: Remove pointer check before delete
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 61bcbfea1408d195c9305e1eb308550a8f01e4ab[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Wed Feb 3 11:13:58 2021 -0300
+
+    AP_TempCalibration: Remove pointer check before delete
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 12cd138030ae3ad2032fdd4546f50b68235e1589[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Wed Feb 3 11:13:58 2021 -0300
+
+    AP_HAL: Remove pointer check before delete
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 6bdc1704f406fe1156c764a86782df70f90a0f01[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Wed Feb 3 11:13:58 2021 -0300
+
+    AP_GPS: Remove pointer check before delete
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit e9a299d96e9be654e5716bd69b193d5eadd220bf[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Wed Feb 3 11:13:58 2021 -0300
+
+    AP_CANManager: Remove pointer check before delete
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit d244f225221eca15a7d9820c20c061430bc9fb75[m
+Author: danlaks <dan@spektreworks.com>
+Date:   Mon Jan 25 19:21:30 2021 -0700
+
+    Tools: AP_Bootloader: Add AP_HW_SWBOOMBOARD_PERIPH identifier
+    
+    SpektreWorks Boom Board AP_Periph device
+
+[33mcommit baf8c9d70c855c62218e0318ee9e4483bfa8a4f1[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Wed Feb 3 07:52:17 2021 +0000
+
+    ChibiOS: update to latest ChibiOS to include osalDbgAssert redefine
+
+[33mcommit c580151d7524f6be6daa00dd52d24d72e7ccbd52[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Feb 3 18:31:33 2021 +1100
+
+    ChibiOS: fixed SRAM3 size for cache disable
+
+[33mcommit 2cdc202d1972f6ba01a84ca499cae1a5c4e6a740[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Fri Jan 22 10:32:30 2021 +0000
+
+    AP_HAL_ChibiOS: use non-cachable SRAM3 for DMA on H743
+    
+    Adjust SRAM1+SRAM2 to 256k as describe in the H743 reference manual
+    Provide access to mem_info() information
+    
+    Co-authored-by: Andrew Tridgell <andrew@tridgell.net>
+
+[33mcommit cfac268f139e140821e494f376eed98f453d0835[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Thu Jan 28 17:38:42 2021 +0000
+
+    AP_Filesystem: add @SYS/memory.txt
+    
+    Co-authored-by: Andrew Tridgell <andrew@tridgell.net>
+
+[33mcommit 0eff201016b20bd3f37a22a0f59cb7128281fa43[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Thu Jan 28 17:38:17 2021 +0000
+
+    AP_HAL: add mem_info()
+    
+    Co-authored-by: Andrew Tridgell <andrew@tridgell.net>
+
+[33mcommit de9382b0f4b481b4f597a14adfb7f4f59afeb717[m
+Author: murata <ma2maru@gmail.com>
+Date:   Sat Jun 13 06:25:55 2020 +0900
+
+    AP_Mission: Reflecting the result of the process
+
+[33mcommit af29f34f2c05e898f78b83c28b01f620befc26bc[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 3 10:36:06 2021 +1100
+
+    Plane: store previous_mode_reason only as a local
+    
+    It's never used outside the mode-changing method.
+
+[33mcommit 698f967b63932d2f56b466b307a03bd5e0b879d9[m
+Author: murata <ma2maru@gmail.com>
+Date:   Sat Nov 28 23:44:45 2020 +0900
+
+    GCS_MAVLink: Notify the maximum number of missions
+    
+    Update libraries/GCS_MAVLink/MissionItemProtocol.cpp
+    
+    Co-authored-by: WickedShell <Wicked.Shell.Scripts@gmail.com>
+    
+    GCS_MAVLink: Notify the maximum number of missions
+
+[33mcommit 82edfc6237ca41454248a0136864b1f810e7b368[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 3 10:49:13 2021 +1100
+
+    Sub: remove unused prev_control_mode_reason
+
+[33mcommit f854477efed20e3ba7d7ef1348c4884af74dc882[m
+Author: Michael du Breuil <wicked.shell.scripts@gmail.com>
+Date:   Tue Feb 2 20:32:45 2021 -0700
+
+    AP_BattMonitor: Limit the scope of possible corruption if the NeoDesigns gets a bad cell count
+
+[33mcommit 699e61da574c7aeced8ba95ffdff7c4713f0542a[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Feb 3 18:11:51 2021 +1100
+
+    Tools: auto-build new matek boards
+
+[33mcommit 4a178d5c446c05ef422926740f32f2296fe1b57e[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Feb 3 18:11:42 2021 +1100
+
+    Tools: added new Matek bootloaders
+
+[33mcommit 00d0fe876d2404e40561bf3c20636646651232ea[m
+Author: Marko <mancinomarko@hotmail.it>
+Date:   Tue Apr 16 23:13:33 2019 +0200
+
+    AP_Compass: Added support for internal i2c bus to VRBrain-v51
+    
+    Now the internal compass HMC5883 of the VRBrain-v51 is correctly recognized
+    
+    Co-authored-by: Pierre Kancir <pierre.kancir.emn@gmail.com>
+
+[33mcommit e600df680e12cd30c685b5cef207fc441e70a0ad[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Sat Jan 30 20:14:19 2021 +0000
+
+    Plane: instantly switch from RTL to QRTL if within radius
+
+[33mcommit 553425f9946acdad3af931ff9a42fe64aa2c0fea[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Wed Jan 27 21:12:58 2021 +0000
+
+    Scripts: add bi-directional dshot firmware to built binaries
+
+[33mcommit 49f0ba058c00fd22ddc50e150a02e92b685f8c88[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Wed Jan 27 21:12:17 2021 +0000
+
+    Bootloaders: add bi-directional dshot bootloaders
+
+[33mcommit 06a1500f98bb754622b8ec5bec3c0b9f3787ffda[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Wed Jan 27 17:56:33 2021 +0000
+
+    AP_HAL_ChibiOS: ensure GPIO pins get undef'ed properly
+    
+    minimise bi-directional dshot configs for:
+    
+    CubeOrange
+    Durandal
+    MatekF405
+    MatekH743
+    OmnibusNanoV6
+    Pixracer
+    mRoPixracerPro
+    omnibusf4pro
+    CUAV-X7
+
+[33mcommit 07c3435f9dbfe195f4dd712be07faa87f275e734[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:37:57 2021 -0300
+
+    SITL: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 7b6f1225bae85d2b4ad3d00e371b1a603af328ca[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:35 2021 -0300
+
+    AP_WheelEncoder: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit b8360a08c772e1c6d0d3b43a10ccb8abbf86abb8[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:35 2021 -0300
+
+    AP_Vehicle: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 9904b397d86a806600f40b1aa712dabeaba2d9cd[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:35 2021 -0300
+
+    AP_UAVCAN: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 6b2e4296db008f624e979771a9aec82529583e39[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:35 2021 -0300
+
+    AP_TemperatureSensor: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit e146483e72990caf1930d6392259395a29561c2a[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:35 2021 -0300
+
+    AP_Stats: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 705a885d8293ccdfdcdad93392201429c0b7cee4[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:34 2021 -0300
+
+    AP_Soaring: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 0da2d9f8ebd60011497f071d5849dc4a167d28ce[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:34 2021 -0300
+
+    AP_SmartRTL: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit bffda5563975793c2bc9a3f6f51a6350c3d6989d[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:34 2021 -0300
+
+    AP_Scripting: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 806bc4898b1e99976251d4c5329420a662dd41b2[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:34 2021 -0300
+
+    AP_Scheduler: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit efffed0510cf0ca4ab61e42494ad73a0692dec9c[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:33 2021 -0300
+
+    AP_RangeFinder: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 2ae7edc8b26faf8ce9305cb1aa4533b452bd4cf3[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:33 2021 -0300
+
+    AP_RTC: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 8f96580e9d088857d8de975d01961869bdd1f39e[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:33 2021 -0300
+
+    AP_RCProtocol: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit a902c1d54bab56b61ecbb790dfb16d63341a3dc5[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:32 2021 -0300
+
+    AP_OSD: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 3df3d002ff87f8e34654481b173fd080a1a1777f[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:32 2021 -0300
+
+    AP_Notify: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 53eb2f2bf49eabf27e02c48230a0ce12bc5f68c2[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:31 2021 -0300
+
+    AP_NavEKF2: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit cc39e36ee11846764bc50f28061e743586cf96cd[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:31 2021 -0300
+
+    AP_Mount: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit bdc14c60fbbc4d7ba621ad44d8dbfe905273c161[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:31 2021 -0300
+
+    AP_Motors: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 266ed9541b474c2e81cd34cdac0739b528d60ecb[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:31 2021 -0300
+
+    AP_Mission: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 5d7d955378f67236772f3634f963a8ca7d1016a1[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:31 2021 -0300
+
+    AP_Math: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 18d8f198012316f5b56bf4dbbd58e001c35aaf2b[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:29 2021 -0300
+
+    AP_Logger: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 41c653f973871f07aa20b3b31b47f1415c9e5965[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:29 2021 -0300
+
+    AP_LandingGear: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit d006012cee51072a1d14159122c92818075368e6[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:29 2021 -0300
+
+    AP_L1_Control: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit dc6f5aec9200e87ce38f5a267b87fe5fa2f302d5[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:28 2021 -0300
+
+    AP_HAL_SITL: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 6899c0b5aff211fd2a80c1a63982a5697bed0f0a[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:28 2021 -0300
+
+    AP_HAL: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 98a8e6e370360e6a3769f1f344dc90cfa3ec1808[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:28 2021 -0300
+
+    AP_GyroFFT: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 2e75425a2a65e9906df6adea8ef51d4c59864091[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:28 2021 -0300
+
+    AP_GPS: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit aa55578008963fe58a9f975620aa4f4a9c6eb198[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:28 2021 -0300
+
+    AP_Frsky_Telem: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit be37f10d61723a834127a11ef297956123bbf917[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:27 2021 -0300
+
+    AP_ExternalAHRS: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 842360b5e34080e88c048135aa001ef0bc5130dc[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:27 2021 -0300
+
+    AP_Compass: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 5375980aa6de8bedbeaec1343aff1f4fafddebe5[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:27 2021 -0300
+
+    AP_Camera: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 001e516fa75c9f691fb3f9393e485e321c2aabf4[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:26 2021 -0300
+
+    AP_Button: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 3fcf430a2c95128488ed67c5eed26d9753d93e30[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:26 2021 -0300
+
+    AP_BoardConfig: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit d190fff887519ca15835b55f8f7cf1fca511ca15[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:26 2021 -0300
+
+    AP_BattMonitor: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 6a824b14675ca3d38df0ed1d0662c55fa318fcad[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:26 2021 -0300
+
+    AP_Baro: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit f6937babfa4ba73e1dec764a16a83c4b7841b35b[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:26 2021 -0300
+
+    AP_Avoidance: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 7e0193589336acb373181856ca6fa8b3de1e4b82[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:26 2021 -0300
+
+    AP_ADSB: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit f9732b6c703637eff30eb8b53db2278a0cdfc209[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:26 2021 -0300
+
+    AC_PID: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 345fe1a9e4e60529ba71c730c621cfba00ea0c15[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:26 2021 -0300
+
+    AC_Fence: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit e4fb439a96b0ff89a401c8c480070ddd38982057[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:25 2021 -0300
+
+    AC_Avoidance: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 7be27235f30daaa27e7dd10ea3443ca3622a1cc2[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:25 2021 -0300
+
+    AC_Autorotation: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 0ecbaa867dab8a455aac6a4bf35d78022353fe94[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:25 2021 -0300
+
+    AC_AutoTune: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit e3d018c4013f5f5e8b926e5ce3c448f7c380dda3[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:25 2021 -0300
+
+    AC_AttitudeControl: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 28c03ffb4eabb11630b4b71481531e00ec3910ac[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:24 2021 -0300
+
+    Rover: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 678cbdfb4f77939b620d817a62fc1482aad5c589[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:24 2021 -0300
+
+    ArduSub: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit cdc7f891a9bf8f7b38d13265968da15398af1018[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:22 2021 -0300
+
+    ArduPlane: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit ad82e01270085cc404210470365997ad252e7d58[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:21 2021 -0300
+
+    ArduCopter: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit c98947fe85981ba7971ffdbcd7236892a1e8c464[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:26:21 2021 -0300
+
+    AntennaTracker: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 03582ff77c17d05e245683ab77604a0b7bcd6108[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:17:44 2021 -0300
+
+    AP_WindVane: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit e8e41c512efc5a8f8ffd5c7092d49577da60818b[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:16:38 2021 -0300
+
+    GCS_MAVLINK: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 45a819c98e231d2c3ef1b49550daea9048d82da6[m
+Author: Patrick José Pereira <patrickelectric@gmail.com>
+Date:   Mon Feb 1 13:15:32 2021 -0300
+
+    StorageManager: Add missing const in member functions
+    
+    Signed-off-by: Patrick José Pereira <patrickelectric@gmail.com>
+
+[33mcommit 7ad6dd858bb2fdb35119a97e571037af132a821a[m
+Author: Michel Pastor <shellixyz@gmail.com>
+Date:   Thu Jan 21 23:15:15 2021 +0100
+
+    ChibiOS: update SuccexF4 bootloader
+
+[33mcommit 41f75876371afa795628fdbec065972c566b03ec[m
+Author: Michel Pastor <shellixyz@gmail.com>
+Date:   Thu Jan 21 23:04:38 2021 +0100
+
+    ChibiOS: Add SWD pins to SuccexF4 bootloader
+
+[33mcommit 881fd4f37c02a856683c83e6456fd71184be3b86[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Tue Jan 26 19:19:44 2021 +0000
+
+    AP_HAL_ChibiOS: use buffered writes for CRSF telemetry
+
+[33mcommit 8d38a627a99e77de040c09da07a987318f37ca16[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 3 10:48:15 2021 +1100
+
+    Rover: move control_mode_reason up to AP_Vehicle
+
+[33mcommit 2b890eda5303885fd958261d129a458bdc993da9[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 3 10:48:15 2021 +1100
+
+    ArduSub: move control_mode_reason up to AP_Vehicle
+
+[33mcommit eaa6b36077b7bd775d219d4f6898ff7b16340db8[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 3 10:48:15 2021 +1100
+
+    ArduPlane: move control_mode_reason up to AP_Vehicle
+
+[33mcommit adc0514cf6ef1f701f6e077c9d9e7b6d43478909[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 3 10:48:14 2021 +1100
+
+    ArduCopter: move control_mode_reason up to AP_Vehicle
+
+[33mcommit ed4a61d5d92dd3f25326aa83d354f74ea0712a19[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 3 10:48:14 2021 +1100
+
+    AntennaTracker: move control_mode_reason up to AP_Vehicle
+
+[33mcommit f15a1fbd627341b772e6ef4eaea468f54116dc07[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 3 10:48:14 2021 +1100
+
+    AP_Vehicle: move control_mode_reason up to AP_Vehicle
+
+[33mcommit cdaff74948dcfbd43fa06d9e5abe6f6f9ab6f65b[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Jan 22 12:21:42 2021 +1100
+
+    autotest: stop trying to arm in QRTL
+
+[33mcommit b6d0208287c1f60b40f65ffda61689a3fba77548[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Jan 22 10:28:26 2021 +1100
+
+    Plane: allow arming in all auto-throttle modes
+    
+    ... except QRTL and QLAND which are now universally denied for arming.
+
+[33mcommit a9be4480b1eae356fb3bb89503e662548034f149[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Tue Jan 19 23:39:17 2021 +1100
+
+    Plane: mark q modes as not having auto-throttle control
+    
+    Reverts part of 6baaf03c8c7e563db00e60ca79e54289c8770fac
+    
+    AvoidADSB was NOT marked as AutoThrottle before that commit but was
+    marked as such in that commit.
+
+[33mcommit 24268cc6de3766c7040179765d3f470b84e7384f[m
+Author: auturgy <james@auturgy.com.au>
+Date:   Tue Dec 29 15:20:29 2020 +1100
+
+    AP_HAL_ChibiOS: add MatekH743-periph hwdef
+
+[33mcommit b91c65b4a4ccb67f6ecc353db0c65a5922736a5f[m
+Author: mateksys <tech@mateksys.com>
+Date:   Mon Jan 18 15:18:50 2021 +0800
+
+    AP_HAL_ChibiOS: add f405-MatekGPS & MatekF405-CAN hwdef
+
+[33mcommit 11bf02c2c4a8782e4dfab741f7695be9b3a83389[m
+Author: Dr.-Ing. Amilcar do Carmo Lucas <amilcar.lucas@iav.de>
+Date:   Thu Dec 17 13:40:55 2020 +0100
+
+    AP_Logger: correct spelling in metadata
+
+[33mcommit 7bbc6991653232159d1e5c81c8328c688ab4afae[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 3 14:07:23 2021 +1100
+
+    Copter: make terrain failure strings human-readable
+
+[33mcommit f65bee80dc38ce56552a31d605cc228bf24ed12c[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Feb 3 11:42:50 2021 +1100
+
+    autotest: use BATTERY_STATUS to detect sub reboot
+    
+    Sub doesn't implement AP_Stats so we have custom reboot detection for
+    it.
+    
+    The current look-for-string strategy is flawed - we're missing the
+    string on reboot
+
+[33mcommit e86e3333a594839c4b1954e97c857045bd54851d[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Tue Jan 12 11:06:13 2021 +1100
+
+    Tools: updated KakuteF7 bl
+
+[33mcommit 9ba35580db94759e8af03a077e47baace08757f2[m
+Author: huhen <kinetic@bk.ru>
+Date:   Sun Nov 29 00:50:44 2020 +0300
+
+    HAL_ChibiOS: Init kakutef7 motor pins for correct initialization of some ESCs
+
+[33mcommit 18f56fbac5614ffa6fb07176ada1d3c421b71094[m
+Author: Arsh <arshpratapofficial@gmail.com>
+Date:   Thu Jan 7 19:59:31 2021 +0530
+
+    AP_HAL:examples:Printf: Improvements in the Printf  example
+
+[33mcommit e13a35abc12393002857a15c7dc71425b9cf5c5e[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Wed Jan 20 12:06:32 2021 +0100
+
+    Autotest: check for empty message before trying to use it
+
+[33mcommit bb576a49b84bbf672bf6452787cddc0b0b9cb92b[m
+Author: yaapu <alex.apostoli@gmail.com>
+Date:   Fri Jan 29 10:02:42 2021 +0100
+
+    Tools: added autotest for frsky rpm telemetry
+
+[33mcommit d5868e3c7d5c850bd03cb7f6e477e589f2b0cc61[m
+Author: yaapu <alex.apostoli@gmail.com>
+Date:   Fri Jan 29 09:50:59 2021 +0100
+
+    AP_Frsky_Telem: added telemetry support for RPM sensors 1 and 2 for SPort, FPort/FPort2 and passthrough over crossfire
+
+[33mcommit cfe63f86572f55f1a684e58711d34fea566752f4[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Tue Feb 2 15:18:34 2021 +1100
+
+    AP_OSD: changed OSD screen switching logic
+    
+    this prevents us constantly changing screens when a PWM is given that
+    matches multiple screens. Instead the first matching screen is used
+
+[33mcommit 275c2849cf38d32c46e868e7f3e216c8fee5aee7[m
+Author: Josh Henderson <hendjoshsr71@gmail.com>
+Date:   Fri Jan 22 23:26:33 2021 -0500
+
+    AP_Baro: Privatize Logging
+
+[33mcommit c32dd4bb5dd6961c927fb93d8557ce2f96994413[m
+Author: Josh Henderson <hendjoshsr71@gmail.com>
+Date:   Mon Feb 1 23:08:50 2021 -0500
+
+    AP_Logger: Privatize AP_Baro Logging
+
+[33mcommit 15ce4fb034cb58f2c77f197ed0214cf09e8ab361[m
+Author: Michael du Breuil <wicked.shell.scripts@gmail.com>
+Date:   Fri Jan 22 16:48:38 2021 -0700
+
+    AP_Periph: Use the ArmingStatus broadcast to set the soft_armed state
+    
+    This allows things like GPS_RAW_DATA 2 to start to work for SBF GPS's
+
+[33mcommit 05b9aa2fa29eff6fc68c8b25dbfe26b0380a7941[m
+Author: Michael du Breuil <wicked.shell.scripts@gmail.com>
+Date:   Fri Jan 22 15:27:23 2021 -0700
+
+    AP_UAVCAN: Broadcast ArmingStatus regularly
+
+[33mcommit d6dc8864db582951634586978d0275c34a23ca87[m
+Author: Josh Henderson <hendjoshsr71@gmail.com>
+Date:   Fri Jan 22 14:50:46 2021 -0500
+
+    AP_Camera: Privatize AP_Camera
+
+[33mcommit d142b3ba169f61b64b173d377d132b37bb36634b[m
+Author: Josh Henderson <hendjoshsr71@gmail.com>
+Date:   Fri Jan 22 14:51:48 2021 -0500
+
+    AP_Logger: Privatize AP_Camera Logging
+
+[33mcommit 401d3654915c8cd3beb37b08d42c1b3317b36a6c[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Wed Jan 27 21:52:24 2021 +0530
+
+    AC_WPNav: Adapt to 3-D Avoidance changes
+
+[33mcommit f3d825bebef63961195f4e34bbcce8823eb469e3[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Jan 17 15:01:57 2021 +0530
+
+    AP_Math: Add unit tests for 3-D lines
+
+[33mcommit de67e2b70c66bb69a8b860ae309ddab71a1f887b[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Jan 10 23:44:24 2021 +0530
+
+    AP_Proximity: refactor changes done for 3-D Boundary
+
+[33mcommit 37a14a78dfb3ea97e07a5b74f64a867dceefc6e0[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Jan 10 23:42:52 2021 +0530
+
+    AC_Avoid: Refactor changes for 3-D avoidance
+
+[33mcommit 5092bc2f6d38b494f7bf6e284581b1f6135baae2[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Dec 27 22:02:34 2020 +0530
+
+    AC_Avoid: Simplify accessing boundary
+
+[33mcommit d359c5ddf20ea2ca8379844224d5e69b9c493b3a[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Dec 27 22:01:05 2020 +0530
+
+    AC_Avoid: Let user take control if they are backing away at a greater speed than what we have calculated
+
+[33mcommit 91132d00d97334eff73f4578c022ea57d43a37fa[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Dec 27 22:00:07 2020 +0530
+
+    AC_Avoid: Add deadzone to backaway code
+
+[33mcommit 343ba1a693018102b33fd1da0ec1eeace3910ad3[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Dec 27 21:51:58 2020 +0530
+
+    AP_Proximity: Use only valid boundary for Simple Avoidance
+
+[33mcommit 71d928aab9793971037581b63fe0e267a9f9f076[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Dec 14 17:00:17 2020 +0900
+
+    AP_Proximity: TeraRangerTowerEvo uses modified Boundary_3D interface
+
+[33mcommit 5c9a65cff6e0f23cee47cfdf02ee94b4e28fe570[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Dec 14 17:00:07 2020 +0900
+
+    AP_Proximity: TeraRangerTower uses modified Boundary_3D interface
+
+[33mcommit d4a6ebd2730ab99fa21475c9990f1fdf35f43a48[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Dec 14 16:59:53 2020 +0900
+
+    AP_Proximity: SITL backend uses modified Boundary_3D interface
+
+[33mcommit 518078c901c8ee3a44f3e245d9abc095bdfb3482[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Dec 14 16:59:41 2020 +0900
+
+    AP_Proximity: RPLidarA2 uses modified Boundary_3D interface
+
+[33mcommit babba91632ccf9e964204681fef25032443ae74a[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Dec 14 16:59:28 2020 +0900
+
+    AP_Proximity: RangeFinder backend uses modified Boundary_3D interface
+
+[33mcommit 2d77adf7203c2b7b20f8a7a69aba3018550cb5ce[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Dec 14 16:59:11 2020 +0900
+
+    AP_Proximity: MAV backend uses modified Boundary_3D interface
+
+[33mcommit a65e0affe4ad8322c8352ce18587a3a5318bf7b9[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Dec 14 16:58:39 2020 +0900
+
+    AP_Proximity: LightwareSF45B uses modified Boundary_3D interface
+
+[33mcommit 623bd6923ef7554ea5a0841391d37cbd215ca656[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Dec 14 16:58:13 2020 +0900
+
+    AP_Proximity: LightwareSF40C_v09 uses update Boundary_3D interface
+
+[33mcommit 4fda6b38f75efa42991233f7ff781eea2ece4f25[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Dec 14 16:57:27 2020 +0900
+
+    AP_Proximity: LightwareSF40C uses modified Boundary_3D interface
+
+[33mcommit ad899de78c3fc2a9284b94cf04a657308d5c08ed[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Dec 14 16:46:10 2020 +0900
+
+    AP_Proximity: backend uses modified Boundary_3D interface
+
+[33mcommit ef9bc64bb13c7b57cd96619febd72cf7244ea034[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Dec 14 16:45:26 2020 +0900
+
+    AP_Proximity: AirSimSITL uses modified Boundary_3D interface
+
+[33mcommit 279b534f67d87d64e09cdc2a89d03dc6122a528c[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Dec 14 16:41:18 2020 +0900
+
+    AP_Proximity: remove duplicate definition
+    
+    PROXIMITY_NUM_LAYERS is defined in AP_Proximity_Boundary_3D
+
+[33mcommit 5a0cc08dcc59271fb8f046358dc4a81bb47c0166[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Dec 14 15:51:18 2020 +0900
+
+    AP_Proximity: refactor Boundary_3D
+    
+    rename stack to layer
+    swap order of layer and sector within arrays
+    rename Boundary_Location to Face
+    rename get_sector to get_face
+    rename set_attributes to set_face_attributes
+    get_distance returns bool and fills in argument instead of returning distance
+
+[33mcommit bd37eab3afab6f58dd2a88c3fa191095f6811f77[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Dec 6 18:18:21 2020 +0530
+
+    Copter: Support 3D Simple Avoidance
+
+[33mcommit ad6e0131713fe5e200d8f90daca927608e9d48ec[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Dec 6 18:15:16 2020 +0530
+
+    AC_Avoid: Support 3D Simple Avoidance and Bacakway
+
+[33mcommit 43717ea55c6e23b8e4c1359bcfd1b07f3a8ca156[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Dec 6 17:54:40 2020 +0530
+
+    AP_Proximity: Add OBSTACLE_DISTANCE_3D mavlink message
+
+[33mcommit 36bba2e02caabe005dd5945772462ab90d144f50[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Dec 6 17:53:55 2020 +0530
+
+    AP_Proximity: Convert Proximity Backend drivers to use 3D Boundary methods
+
+[33mcommit 4fce715a9a7552a6b4e81a8b59bc999d29eede45[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Dec 6 17:51:40 2020 +0530
+
+    AP_Proximity: Shift methods to Proximity_Boundary_3D class and support 3D Boundary
+
+[33mcommit 7569d8bf8ea45f3a52edc09daf9180792240d02b[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Dec 6 17:50:02 2020 +0530
+
+    AP_Proximity: Add AP_Proximity_Boundary_3D class
+
+[33mcommit a5fafe57d83b289bd9afa6468a1190fdface9233[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Dec 6 17:47:48 2020 +0530
+
+    GCS_MAVLink: Add support for OBSTACLE_DISTANCE_3D
+
+[33mcommit 1262d730716fe70604987ac7647ad4ec3aa5c63f[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Dec 6 17:47:06 2020 +0530
+
+    AP_Math: Add new methods to support 3D avoidance
+
+[33mcommit 79d5e432ee3f4c48a97344c84b0953dcd6ec48e5[m
+Author: Rishabh <f20171602@hyderabad.bits-pilani.ac.in>
+Date:   Sun Dec 6 17:46:43 2020 +0530
+
+    AP_Math: Add new method to extrapolate 3D vector given distance, yaw, pitch
+
+[33mcommit dbae56eb3a357c8159f9b1786844979c00acf33c[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Jan 28 11:30:00 2021 +1100
+
+    AP_Logger: panic in SITL if we fail to log a Replay block
+    
+        // failing to log a block means that when we go to replay the log
+        // things will almost certainly go sour.
+
+[33mcommit a5d33cacb5415f8f551138d8f0a5d97deb198a45[m
+Author: Tom Pittenger <magicrub@users.noreply.github.com>
+Date:   Fri Jan 29 10:16:33 2021 -0800
+
+    AP_Soaring: add units to param SOAR_THML_BANK
+
+[33mcommit d1578e5ba26522030cd6bda277e310ec5a3dfba9[m
+Author: Samuel Tabor <samuelctabor@gmail.com>
+Date:   Mon Jan 25 10:53:00 2021 +0000
+
+    autotest: Update soaring default params in line with specified SOAR_THML_BANK.
+
+[33mcommit d2c8eb8ce9767aab68a2a03d95ef27defde65234[m
+Author: Samuel Tabor <samuelctabor@gmail.com>
+Date:   Wed Jan 20 21:08:27 2021 +0000
+
+    Plane: Allow AP_Soaring to specify loiter radius in THERMAL mode.
+
+[33mcommit 4ec1e558330f5208046ad7200f5b8f5908d8ad40[m
+Author: Samuel Tabor <samuelctabor@gmail.com>
+Date:   Wed Jan 20 21:07:31 2021 +0000
+
+    AP_Soaring: Add SOAR_THML_BANK parameter and associated logic.
+
+[33mcommit 4fbba1750658acaae07ad8e03ee158df043acf8c[m
+Author: yaapu <alex.apostoli@gmail.com>
+Date:   Sun Dec 20 20:57:43 2020 +0100
+
+    AP_Scripting: added bindings for frsky telemetry library
+
+[33mcommit 24382e25fc0ff2e880e931102ccf59f59d6f4896[m
+Author: yaapu <alex.apostoli@gmail.com>
+Date:   Sun Dec 20 20:57:08 2020 +0100
+
+    AP_Frsky_Telem: added support for sending frsky telemetry data from scripting
+
+[33mcommit 0f363809f5e0ef713c6ca0d55aee7aaf06465832[m
+Author: Michael du Breuil <wicked.shell.scripts@gmail.com>
+Date:   Wed Jan 27 13:16:08 2021 -0700
+
+    AP_GPS: Fix some unit errors with the GPS blended instance
+    
+    Also add a static assert and some docs on the fact that blending only
+    works with 2 actual recievers at the moment
+    
+    Also a small optimization to not call get_rate_ms() twice
+
+[33mcommit 6f5d5c2bf9eb87aca4c1653a7fe3ad17613ac1c1[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Sat Jan 23 13:54:41 2021 +0000
+
+    AAP_HAL_ChibiOS: allow asserts to be printed on a GPIO pin
+
+[33mcommit d41c92d3171ddfd5188b5bcf7db3a968eac7ce7e[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Mon Jan 25 21:16:46 2021 +0000
+
+    AP_HAL_ChibiOS: don't overwrite fault handler data, register forced faults
+
+[33mcommit 20d928a86a9e237f0d3a7a33b13fa51ba326750d[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Wed Dec 30 18:16:31 2020 +0000
+
+    AP_HAL_ChibiOS: don't share DMA on OmnibusNanoV6 for Flash SPI
+
+[33mcommit 873d35acd9e39b4d972a1f6c1ec15135b6c6a914[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Sun Jan 24 09:30:48 2021 +0000
+
+    AP_HAL_ChibiOS: bi-directional dshot for MatekH743
+
+[33mcommit 877dde473600c08f86c6990fc549385dceb833ec[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Wed Jan 20 08:21:01 2021 +0000
+
+    AP_HAL_ChibiOS: on BeastF7 share TIM3 UP/CH and give flash SPI dedicated channel
+
+[33mcommit 2395018000b6d1bf8abc7993bf224ff12c888050[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Tue Jan 26 16:28:58 2021 +0000
+
+    AP_BLHeli: don't log invalid bi-dir dshot values as they are never used
+
+[33mcommit 9249b73e8b0d39eef4d695cfdbc9903cf635fd65[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Wed Jan 20 21:53:33 2021 +0000
+
+    AP_HAL_ChibiOS: correctly allow mixing of bidir and non-bidir channels
+
+[33mcommit 2823fa724527e572e020fd20a21abc08ed66a830[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Mon Jan 25 21:11:10 2021 +0000
+
+    AP_HAL_ChibiOS: never write bytes that have not been erased on H7
+    
+    Be more careful about flash failure conditions on H7
+
+[33mcommit 78735a946edbeb10c7bd1ad87bca1dc362145f03[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Sat Jan 23 20:01:16 2021 +0000
+
+    AP_HAL_ChibiOS: allow STM32_FLASH_DISABLE_ISR for H7
+
+[33mcommit 6bc4e995a410bb14a49ef0e4aa3e3a9fdb6cade3[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 27 09:36:30 2021 +1100
+
+    CI: build CubeOrange-periph
+    
+    this ensures H7 based peripherals (which are getting more common)
+    don't break
+
+[33mcommit 155de6d2bc49ac05d85abb0f131ee987481e35f7[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 27 09:34:47 2021 +1100
+
+    HAL_ChibiOS: fixed build of AP_Periph on H7
+
+[33mcommit 96dc8339f169804375e77d864d156bf27f9602ad[m
+Author: Lau Yan Han <sps08.lauyanhan@gmail.com>
+Date:   Tue Jan 26 08:19:01 2021 +0800
+
+    Build.md: Updated waf configure commands for CubeBlack and fmuv3
+
+[33mcommit c02dfd121493a02580599a94c9b14d8bc68a6b9b[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Tue Jan 26 17:39:53 2021 +0100
+
+    Autotest: add EndMissionBehavior Test for rover
+
+[33mcommit db1c653cc68545fa440f0b535fff7611a136a5fc[m
+Author: Shadow <proteyrus@gmail.com>
+Date:   Thu Feb 20 20:25:54 2020 +0300
+
+    Rover: Add manual mode to MIS_DONE_BEHAVIOR
+
+[33mcommit 0535c4f5929bb312ac3459b0d44ad268cdc12ec0[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 23 10:11:14 2021 +1100
+
+    AP_InertialSensor: default TMAX to 70
+    
+    if user forgets to set this then better to just timeout rather than
+    calibrating over a small range
+
+[33mcommit 9861a02c6029cfaa2d04469ffeadb34fec6dd53b[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Fri Jan 22 07:14:33 2021 +1100
+
+    HAL_ChibiOS: save INS_ACC*ID persistent parameters
+    
+    this enables full factory accelerometer calibration, so the user is
+    not required to run an accelcal, even if they change vehicle type
+
+[33mcommit bdb364d4619df6002fc1f085191c125f5aec12fc[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Fri Jan 22 06:47:37 2021 +1100
+
+    AP_InertialSensor: save the accelerometer ID parameters
+    
+    this is needed for factory accel cal
+
+[33mcommit 87528f47c8ddbc8ac7a750b06841901c2ac6dc31[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Fri Jan 22 06:38:06 2021 +1100
+
+    AP_IOMCU: prevent internal error on bootloader flash
+    
+    when we flash the bootloader on boards with an IOMCU we expect a long
+    delay as the CPU stops during the flash
+
+[33mcommit bb278a1cc76a0bdcb6353e8c2de436a6e7e461ab[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Fri Jan 22 06:14:05 2021 +1100
+
+    Tools: allow tempcal_IMU.py to run without existing tcal params
+    
+    this makes it possible to run the tcal script on a log from a board
+    that doesn't have any existing temperature calibration params
+
+[33mcommit 6163659887e3359a9731092d432d3a782d0e6f47[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 23 08:07:47 2021 +1100
+
+    AP_HAL: prevent a single bad transfer causing an IMU to be marked unhealthy
+    
+    This is a response to this issue:
+    https://discuss.ardupilot.org/t/gyro-problem-after-waypoint-log-analisys
+    
+    The 2nd gyro went bad with a large offset. Then the first gyro was
+    marked unhealthy, forcing the EKF to switch to the 2nd gyro. That
+    resulted in a crash.
+    
+    I think the SPI bus was getting bad transfers and the register check
+    code happened to get a bad transfer, thereby marking the first gyro
+    unhealthy
+    
+    This change ensures we only fail the register check if two transfers
+    in a row are bad. This makes it much less likely that a noisy bus will
+    lead to an unhealthy gyro
+
+[33mcommit 2b71bf8e99cb905ee097f2a2975341be99325209[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Tue Jan 26 20:35:11 2021 +0100
+
+    Autotest: fix subtests completion
+
+[33mcommit b20604bb592e4169dcb83bdeeb1d27f971e6d958[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Tue Jan 26 17:12:59 2021 +1100
+
+    Plane: update release notes for 4.0.8
+
+[33mcommit ebfe593e38acefcc6d7d377f93e5d0cb9b9f81bc[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Jan 26 00:11:28 2021 +0000
+
+    AP_Scripting: add example script setting up a custom MotorMatrix
+
+[33mcommit 643966fb3e19cac5a553064bd7a24abb963ea346[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Jan 19 17:21:15 2021 +0000
+
+    Copter: add SCRIPTING_MATRIX frame class
+
+[33mcommit 004f873dc741235b9cbdeaefc6c0c4a7569cbe17[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Jan 19 17:20:45 2021 +0000
+
+    Plane: update Quadplane FRAME_CLASS description
+
+[33mcommit 5c397d4674bfd0ac838b066748d2892bc6063401[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Jan 19 16:52:02 2021 +0000
+
+    AP_Scripting: add MotorMatrix bindings
+
+[33mcommit fca6f7027bee9398ed18268f234446fa428148bc[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Jan 19 16:44:02 2021 +0000
+
+    AP_Motors: allow Matrix config from scripting
+
+[33mcommit d0e1e85b9e43e181b597d94f8cf9de5515b079e5[m
+Author: Peter Hall <iampete@hotmail.co.uk>
+Date:   Thu Dec 24 21:17:37 2020 +0000
+
+    AP_Motors: add get_frame_mav_type
+
+[33mcommit 0a23084d4365e1eb8e4863e02d57173a6e9cd9fc[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Jan 19 17:00:53 2021 +0000
+
+    Copter: move get_frame_mav_type to motors
+
+[33mcommit 5f4b5c4b94d31a3b2a6cc82560853ac40dba1099[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Feb 17 16:36:56 2020 +1100
+
+    Plane: prevent failsafe from changing mode during landing
+    
+    this prevents RC or GCS failsafe from triggering a mode change during
+    a landing
+
+[33mcommit 87486739d12a005755f2c8efa3d069035971ec5e[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Jan 21 11:48:01 2021 +1100
+
+    Plane: disallow changing to INITIALISING mode
+
+[33mcommit d487d6152e741a7c54e1e5749043e72043629db9[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Thu Jan 21 15:24:01 2021 +0900
+
+    Plane: ahrs pre-arm always runs position checks
+
+[33mcommit e7c2eb1705f3a3cb71f77c3e4402349d6bb3c247[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Thu Jan 21 15:23:12 2021 +0900
+
+    Sub: ahrs pre-arm skips position checks
+
+[33mcommit f6da769de834ba2ca92a9be37f7d9d2dea408125[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Thu Jan 21 13:16:45 2021 +0900
+
+    Rover: ahrs only checks position in modes that require it
+
+[33mcommit dc515b87df79184191a5c0f7ddd01c2328fd2625[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Thu Jan 21 13:16:29 2021 +0900
+
+    Copter: ahrs only checks position in modes that require it
+
+[33mcommit f6cb0819ef90cfaed32d799fd7981dff78d86521[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Thu Jan 21 12:42:58 2021 +0900
+
+    AP_NavEKF3: pre_arm_check may skip position checks
+
+[33mcommit 8ecac27777f59d9aacfbb032b171e4566d3dbd73[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Thu Jan 21 12:42:47 2021 +0900
+
+    AP_NavEKF_Source; pre_arm_check may skip position checks
+
+[33mcommit 62932f884fa4352a31d6ec244db2d4523aede240[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Thu Jan 21 12:42:19 2021 +0900
+
+    AP_AHRS: pre_arm_check may skip position checks
+
+[33mcommit 49e2a0caed4d83b55e52f0370651767747c5ff42[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jan 21 21:55:55 2021 +1100
+
+    Tools: fixed valgrind errors with AP_Param::ParamToken
+
+[33mcommit 1716fcf99529dff9c9ff15a76954f3ccf6bdfcee[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jan 21 21:55:55 2021 +1100
+
+    GCS_MAVLink: fixed valgrind errors with AP_Param::ParamToken
+
+[33mcommit ac35867c17dd0fe5625d500e3284de66a6c8eadc[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jan 21 21:55:55 2021 +1100
+
+    AP_Param: fixed valgrind errors with AP_Param::ParamToken
+
+[33mcommit 12b93e292299aa2ab9de8d48e9ef5507d9783567[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jan 21 21:55:55 2021 +1100
+
+    AP_OSD: fixed valgrind errors with AP_Param::ParamToken
+
+[33mcommit 6c684538d35d2f76f81c95064676006fa495eccc[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jan 21 16:57:19 2021 +1100
+
+    AP_Param: greatly speed up param download with disabled parameters
+    
+    allows fast skip over disabled subgroups. This removes a long delay
+    with param download on a MatekF405-STD where the final parameters
+    associated with the OSD took 80ms to fetch, causing a long loop delay
+
+[33mcommit d19dca37d5a7568fb5eacc4d993a551440f7e4bc[m
+Author: Bill Geyer <bnsgeyer@aol.com>
+Date:   Mon Jan 25 18:14:25 2021 -0500
+
+    Copter: 4.0.6 release notes
+
+[33mcommit 95bc9cca790aa8296052bb191f7e2b4c6a2767f1[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Jan 22 09:19:38 2021 +1100
+
+    ArduPlane: use ground_course in preference to ground_course_cd
+
+[33mcommit d426d8e1f836dc159f92c6e3fd3d4db980832fbe[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Jan 22 09:19:38 2021 +1100
+
+    AP_GPS: use ground_course in preference to ground_course_cd
+
+[33mcommit 358069df246361d104bf25b1d52e0a5fd861effc[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Jan 22 09:19:38 2021 +1100
+
+    AP_AHRS: use ground_course in preference to ground_course_cd
+
+[33mcommit 2e2ec79992e8d693d62c35c14e476e1c986b9aa5[m
+Author: WillyZehnder <39805388+WillyZehnder@users.noreply.github.com>
+Date:   Fri Jan 22 18:34:40 2021 +0100
+
+    RC_Channel: reserve AUX_FUNC for MISSION_RELATIVE
+
+[33mcommit a62dc3b3e0e44fdb0dd2d0420b4f17fcbeeea7e1[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Mon Jan 25 14:31:31 2021 +0100
+
+    Rover: disable switching and arming in INITIALIZING mode
+
+[33mcommit d47afb24064349e13d2dc55d5f19e3b48955c8ba[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 25 09:33:03 2021 +1100
+
+    autotest: added AHRSTrim test and add trim to accel cal test
+    
+    this ensures the handling of AHRS trim is correct
+
+[33mcommit 2843cfa42d8c65f436c70ed63a843bfa0326f658[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 25 09:07:16 2021 +1100
+
+    AP_InertialSensor: use mavlink statustext for cal info
+
+[33mcommit b542f947f76743eab5028ecd03fb4fc62eac7f8b[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 25 09:06:06 2021 +1100
+
+    AP_InertialSensor: don't mark accels as calibrating during trim
+    
+    we need the accels with offsets applied when doing accel trim
+
+[33mcommit e908a996af0d83bf72bb2dc11dfb814c491dceee[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sun Jan 24 16:55:08 2021 +1100
+
+    AP_InertialSensor: support SIM_ACC_TRIM
+    
+    and cleanup vector maths
+
+[33mcommit 7292b4f2605438a376924279ed95d01224125222[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sun Jan 24 16:54:42 2021 +1100
+
+    SITL: added SIM_ACC_TRIM_{X,Y,Z} for simulating IMU trim
+    
+    this will enable an autotest for AHRS trim
+
+[33mcommit 2ae57f8861db1888c78e1d8af5535a4fcf866076[m
+Author: murata <ma2maru@gmail.com>
+Date:   Sat Jan 23 23:52:52 2021 +0900
+
+    Rover: Change delay method to HAL scheduler's delay
+
+[33mcommit d533d289da5400f97907175aea4929fc12e89b5e[m
+Author: murata <ma2maru@gmail.com>
+Date:   Sat Jan 23 23:52:07 2021 +0900
+
+    Rover: Change delay method to HAL scheduler's delay
+
+[33mcommit ddc4d08e8ff43111f5c8a0925aff7f5583eac73d[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Tue Jan 19 15:36:39 2021 +1100
+
+    AP_NavEKF3: make drag fusion optional
+
+[33mcommit 1ccda938cb178d7ab239a4bdff7b121b3642185f[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Tue Jan 19 15:27:03 2021 +1100
+
+    AP_NavEKF3: make external navigation optional
+
+[33mcommit 8da511f039fb8b31dfc65504893ed21c786d73ae[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Tue Jan 19 12:53:20 2021 +1100
+
+    AP_NavEKF3: make body odomotry build depend on vehicle type
+    
+    saves about 11k of flash
+
+[33mcommit 3c825bdffc8d0a819051584e0c63f66ff8040eee[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Tue Jan 19 12:53:39 2021 +1100
+
+    waf: make AP_NavEKF3_core.h a vehicle dependent include
+
+[33mcommit ad2ab333f995511b2e381c76b4a93a443445b247[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Mar 13 16:53:56 2019 +1100
+
+    Tools: autotest: allow autotest to connect directly to SITL
+
+[33mcommit 8c7d63433c58c1ec89e99bb24da4105dbca68487[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Jan 22 08:41:49 2021 +1100
+
+    autotest: clear mission ourselves rather than with MAVProxy at end of test
+
+[33mcommit 2ee052b36e82c3d466c4318498b557ec80671f00[m
+Author: E Thomas <ethomas997@etsphere.com>
+Date:   Sun Sep 15 02:19:19 2019 -0400
+
+    AP_GPS: Made GPS_DISABLE prevent last_fix_time_ms updates
+
+[33mcommit ade1c487d87aa1290d1c0a2823a62ed6a127c5fd[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Sep 24 11:25:01 2020 +1000
+
+    AP_Logger: remove default reason argument for Write_Mode
+    
+    All callers now supply this
+
+[33mcommit 25fff17e48a2cd0d8a0704583a54a4fa883fbbf5[m
+Author: Leonard Hall <leonardthall@gmail.com>
+Date:   Fri Jan 22 13:43:53 2021 +0900
+
+    AC_AttitudeControl: constify some local variables
+
+[33mcommit 9e7a0e62674c8fa8ad3208b2e4e446dd8045bdba[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Tue May 28 10:57:41 2019 +1000
+
+    Copter: use iterators in parameter conversion
+
+[33mcommit 3582b69e9c03d45af82760d2af67f310be74e5f4[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Jan 21 21:20:43 2021 +1100
+
+    AP_NavEKF3: remove getFilterTimeouts access methods
+
+[33mcommit 445a461f12b42b9caef1cfb7018a671e4e5d5743[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Jan 21 18:02:07 2021 +1100
+
+    AP_NavEKF2: remove getFilterTimeouts access methods
+
+[33mcommit 30836535d0e929d2da9efb2426ab86e4c6c9ca98[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Jan 21 22:34:27 2021 +1100
+
+    autotest: retry dynamic notch test up to 3 times
+
+[33mcommit ae1a66723207ec87595da2035c0863aff1a753b0[m
+Author: bugobliterator <siddharthbharatpurohit@gmail.com>
+Date:   Thu Jan 21 22:57:51 2021 +0530
+
+    .gitignore: ignore tasklist.json
+
+[33mcommit 4e487f2598bd0fc6b86ea1c4a55762f293d43b5d[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Tue Jan 19 16:54:23 2021 +0100
+
+    wscript: add list_ap_periph_boards function
+
+[33mcommit 805493c85409ee1e5ff0335137e1913c2f9f67bc[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Tue Jan 19 16:54:06 2021 +0100
+
+    ardupilotwaf: use dynamic generation for ap_periph board name
+
+[33mcommit c54a597571b996dbb511997af47d9ec20c81db7e[m
+Author: Siddharth Purohit <siddharthbharatpurohit@gmail.com>
+Date:   Wed Jan 6 03:13:49 2021 +0530
+
+    AP_Periph: pull out supported targets from wscript into a separate file
+
+[33mcommit 3ae76fa64b95b40a6cc2ffa0a08ec7448107764b[m
+Author: Siddharth Purohit <siddharthbharatpurohit@gmail.com>
+Date:   Wed Jan 6 03:13:03 2021 +0530
+
+    wscript: add generate tasklist for use by vscode extension
+
+[33mcommit 2e2e34d784060fd6d0fbd1d61023d31fec4f35eb[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Jan 21 22:09:34 2021 +1100
+
+    autotest: correct run_one_test case (vehicle.testname case)
+
+[33mcommit 1fec88af217ff7e3f8855277342698d635d37276[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Jan 21 12:56:16 2021 +1100
+
+    autotest: make arming test a little more verbose
+
+[33mcommit 401cccca19fc46255dfc38159719904f1ee7c6bc[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Dec 17 15:42:40 2020 +1100
+
+    AP_NavEKF2: correct description on NKF3.SVT
+
+[33mcommit b3bacdd33c96e503905171540b0bd454f01e62fb[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Dec 17 15:42:24 2020 +1100
+
+    AP_NavEKF3: remove internal-only getTiltError method
+
+[33mcommit dddb285209358148fed2ef81d4f6c3a5e5eaf06c[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Dec 17 15:42:23 2020 +1100
+
+    AP_NavEKF2: remove internal-only getTiltError method
+
+[33mcommit 5ad0ac6727348b317ada6dce732542e8421158e7[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Dec 17 15:30:37 2020 +1100
+
+    AP_NavEKF3: remove unused getAccelNED method
+
+[33mcommit 6b60bae0685437f47390197c9d77e78f904a8ec3[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Dec 17 15:30:37 2020 +1100
+
+    AP_NavEKF2: remove unused getAccelNED method
+
+[33mcommit e32ca819fc3e1dc57a2aa0380cbf866a57156829[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Sat Jan 12 09:32:50 2019 +1100
+
+    GCS_MAVLink: mark results as unused
+
+[33mcommit 60d0b0f07cd644c1fb52e39a7f3809da501d2bc5[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Sat Jan 12 09:32:18 2019 +1100
+
+    AP_AHRS: add WARN_IF_UNUSED to some getters
+
+[33mcommit 281296832ab882f757e85551de98ad5c93f7a112[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Jan 21 15:27:51 2021 +1100
+
+    autotest: retry GyroFFTHarmonic test on failure
+
+[33mcommit 3279400e2ed24457dc021a89083c5bd3d46bc0eb[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Jan 21 11:51:40 2021 +1100
+
+    autotest: disarm_with_rc_input shortcuts if it sees rudder-disarm-disabled
+
+[33mcommit f452c6bb510bcc796366ceb5b8eedcd8d452f5d7[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Thu Jan 21 11:53:53 2021 +1100
+
+    autotest: break out a statustext_in_collections method from wait_statustext
+
+[33mcommit 3add0459248b0a317a6e37c69d10df2f2d2118df[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 16:35:10 2021 +1100
+
+    autotest: fixed accel/gyro threshold consistency for tempcal
+
+[33mcommit fe7d933976885bfab87de9bc78f3737a6d860161[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 16:18:55 2021 +1100
+
+    autotest: use delay_sim_time() in tempcal test
+
+[33mcommit 6c8a57c2d70899b10b5935cdbfed2931f784793c[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 15:38:24 2021 +1100
+
+    AP_InertialSensor: review fixes
+
+[33mcommit af18e0c75524f0b24fb6998cd0e848d895b7a2c2[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 15:38:05 2021 +1100
+
+    Tools: review fixes
+
+[33mcommit 3ff71c78144918b6730ed47639e08e44178b004e[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 15:07:15 2021 +1100
+
+    AP_InertialSensor: changes from review feedback
+
+[33mcommit 58b9cd2c6ef061600a7c1642eb1ff3ea3516a55a[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 14:52:58 2021 +1100
+
+    autotest: added assert_reach_imu_temperature() abstraction
+
+[33mcommit 5a5ba2646841310d262209c60befe0645ffb21da[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 13:36:07 2021 +1100
+
+    autotest: expanded accelcal test to check values
+    
+    this checks the resulting accelcal is correct within 1%
+
+[33mcommit b12a663f7a3047622a353cec6213056a87774ab6[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 13:35:24 2021 +1100
+
+    AP_InertialSensor: apply accel scaling
+
+[33mcommit 9febcc0f98f6729085b6c93042b62b43d2c76b6a[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 13:35:13 2021 +1100
+
+    SITL: added accel scaling parameters
+
+[33mcommit 3e640eed803668e46e0ff8571ebda297b32c77d0[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 11:55:01 2021 +1100
+
+    autotest: changes for per-IMU biases and scaling
+
+[33mcommit 73ddde362945e23d08e8a018277db04f187c36a4[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 11:54:46 2021 +1100
+
+    AP_InertialSensor: changes for new SITL IMU params
+
+[33mcommit b5089580a9d4f7f5abe62b50f34832ba61739fc7[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 11:53:58 2021 +1100
+
+    SITL: cleanup IMU parameters
+    
+    allow for biases per IMU
+
+[33mcommit 5e60fac37e8cebae5cf5fad3803a84420f9add82[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Tue Jan 19 11:50:00 2021 +1100
+
+    AP_InertialSensor: remove unused variable
+
+[33mcommit c96e61c0e19b23a1415f25cc6cf1db16155a7a54[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Tue Jan 19 09:20:27 2021 +1100
+
+    Tools: review fix
+
+[33mcommit 4c315b57ca3a127ec945fb68c2442eaefb5d2af3[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 18 18:47:37 2021 +1100
+
+    autotest: run gyro/accel cal at non-reference temperature
+
+[33mcommit 5a180fa7a85fd4d416178eac50c63a613fb4c4eb[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 18 18:44:51 2021 +1100
+
+    Tools: cope with offset from cal temp to reference temp
+
+[33mcommit 2359a5a1ea48d2e61869e5e257779c9e503f3b4a[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 18 12:30:24 2021 +1100
+
+    Tools: fixed stopping of capture on enable change in tempcal
+
+[33mcommit 285b53fe074343d202ada50d4d5fd00717cb62a5[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 18 12:29:02 2021 +1100
+
+    AP_InertialSensor: use vector polyfit
+    
+    this reduces memory usage
+
+[33mcommit a1fb0592a9e9dbdb7b094929045b02b3fee89d7c[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 18 12:28:32 2021 +1100
+
+    AP_Math: specialise polyfit for vectors
+    
+    this is needed to get the precision good enough for wide temperature
+    ranges when summing the resulting polygon coefficients
+
+[33mcommit c8aaceb6acad534fd928f910b321d2294b1c5346[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 18 12:27:32 2021 +1100
+
+    AP_LeakDetector: remove warning message on all non-sub builds
+    
+    pointless pragma
+
+[33mcommit 2cf7e7945c7688f8752e7d6e1994fc3f2b0f0ff7[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 18 11:41:42 2021 +1100
+
+    autotest: make tempcal debug output clearer
+
+[33mcommit d0d480e858948f69deb5ff44b2b55794a1697ef4[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 18 11:40:55 2021 +1100
+
+    AP_Compass: fixed matrix inverse for new name
+
+[33mcommit 8278a8a00b74659f7b3e00931d59e5637bb7ce37[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 15:06:58 2021 +1100
+
+    AP_AccelCal: rename from review feedback
+
+[33mcommit 2e2ccb40b222190658ed19c2d162d6cae578b903[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 18 11:40:04 2021 +1100
+
+    AP_AccelCal: fixed inverse matrix call for new name
+
+[33mcommit 999268cbba2a17daa766e671c9025cc1e6f65d15[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 18 11:39:26 2021 +1100
+
+    AP_Math: fixup matrix algorithms to be in cpp file
+    
+    this fixes an issue where optimize O2 was forced on any file that
+    included AP_Math.h. It also fixes the test suite for matrix_alg, and
+    fixes the type handling to be consistent
+
+[33mcommit 3b3e2c01f87c4ab875bf8e0774d2c6642305b451[m
+Author: bugobliterator <siddharthbharatpurohit@gmail.com>
+Date:   Sat Jan 9 23:39:13 2021 +0530
+
+    AP_Math: templatize matrix_alg methods
+
+[33mcommit 6254787c26db3175ab3827facb19527b253b4ccd[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sun Jan 17 16:45:13 2021 +1100
+
+    Tools: fixed tempcal for when we have gyro cal but no accel cal
+
+[33mcommit e87dbacee73b22ea0c85471555a36950e48aff6b[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sun Jan 17 14:28:11 2021 +1100
+
+    Tools: switch to fixed reference temperature of 35C
+
+[33mcommit ffe20f7958874763c30c76c5e0852b4a52f58074[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sun Jan 17 14:27:51 2021 +1100
+
+    AP_InertialSensor: use a fixed reference temperature of 35C
+    
+    this allows us to timeout the calibration when the temperature stops
+    rising as the polynomial no longer depends on the maximum temperature
+
+[33mcommit a96b6336b8f616f1aeaa27b3246e40043895d387[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sun Jan 17 09:26:22 2021 +1100
+
+    Tools: changes from review feedback
+
+[33mcommit dc58b0b9509e0c2b6ba4ecbb47f79cb430a15a37[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sun Jan 17 09:26:09 2021 +1100
+
+    AP_InertialSensor: changes from review feedback
+    
+    thanks Sid!
+
+[33mcommit 9561f24c0e8ab1e64df0a5b86f8bea6e25259003[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sun Jan 17 09:22:43 2021 +1100
+
+    AP_Filesystem: added @SYS/persistent.parm
+
+[33mcommit 5ed19c764ea09d90616a1695dfb23f20b5fed9ce[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sun Jan 17 09:22:29 2021 +1100
+
+    HAL_ChibiOS: expose load_persistent_params for @SYS
+
+[33mcommit 1680e6e7d6417da7dc3d5d9b51749a8b4134a77b[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sun Jan 17 09:22:11 2021 +1100
+
+    AP_HAL: expose load_persistent_params() in hal.util
+
+[33mcommit c9a83c8127e17fbecd6a84552bd77f37cfe667e6[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 16 16:40:00 2021 +1100
+
+    AP_InertialSensor: added INS_TCAL_OPTIONS
+    
+    make persistent params optional, and allow save of accelcal
+
+[33mcommit 5c823debc04f28cc0c6a9eccc4298a4f75126988[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 16 16:01:04 2021 +1100
+
+    HAL_ChibiOS: support saving persistent parameters to bootloader sector
+    
+    when we flash the bootloader we can save key peristent parameters to
+    the end of the bootloader sector, allowing them to persistent across
+    changes of firmware type
+    
+    This allows for factory temperature calibration
+
+[33mcommit 504f500fae609b3dd07f63876a1203a25b5cca95[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 16 15:59:55 2021 +1100
+
+    AP_Common: added get_writeable_string to ExpandingString
+
+[33mcommit 1ddc21c9bb221cb31337f3b5326de710651ca491[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 16 15:59:35 2021 +1100
+
+    AP_InertialSensor: support saving tempcal params persistently
+
+[33mcommit 84dda13b42ee1140d1ce3adc6f6fc3170f4bfb0f[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 16 12:23:36 2021 +1100
+
+    autotest: use new learn param setup
+
+[33mcommit 8caea96ab1fb2785e56fbd7375602cfd29f9fe3e[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 16 12:23:17 2021 +1100
+
+    AP_InertialSensor: start auto-learning at boot
+    
+    This makes it easier to setup the params. The ENABLE=2 value only
+    takes effect at boot
+
+[33mcommit e8ab8ed29eeddcfc6adf567e4d64c1a2fa07d79a[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 16 09:53:59 2021 +1100
+
+    Tools: improve tempcal script
+    
+     - allow display of log corrections
+     - added online estimator
+     - allow learning using TCLR records
+
+[33mcommit 30385fb8cb4def46435a4f092b66fedcb4072514[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jan 14 12:16:39 2021 +1100
+
+    autotest: use set_parameters() in IMU temp cal test
+
+[33mcommit 0c3655b01f9ceed468a4bbdeef5af9e2cba8a1a4[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jan 14 12:16:20 2021 +1100
+
+    autotest: fixed epsilon handling in set_parameters
+
+[33mcommit 7cb7ad3636cfa29a687c8a78abb6c28f5cdaa3d5[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jan 14 10:31:47 2021 +1100
+
+    AP_InertialSensor: fixed build error
+
+[33mcommit 2e9f61fe499f9bc08e74dd2c297e9c4a1958fd35[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 11 08:08:22 2021 +1100
+
+    AP_InertialSensor: fixed IMU index display in msgs
+    
+    start at 1 for users
+
+[33mcommit d5b511f4a0442872f0cd3c02409d8c0b1e89ba66[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 11 08:08:00 2021 +1100
+
+    AP_InertialSensor: fixed start timer for temperature in SITL
+    
+    when we are doing an autotest we want the temperature to start
+    climbing when we first set SIM_IMUT_FIXED=0
+
+[33mcommit 30e55d8dfc7f52184c9f6b331832aba0799f14b9[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 11 07:37:08 2021 +1100
+
+    AP_InertialSensor: cope with user changing TMAX while calibrating
+
+[33mcommit 68526262b773a45e740cf9ca214cdb7f294013b0[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 11 07:26:49 2021 +1100
+
+    AP_Arming: don't allow arming during IMU temp cal
+
+[33mcommit e2e97c67cebb154a220a74ce2ad78e709eb04a32[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 11 07:26:17 2021 +1100
+
+    AP_InertialSensor: catch user attempt to change TMAX during cal
+
+[33mcommit 73e53369e83e520b844dccfad99bcab5fbbf67a6[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 11 07:09:44 2021 +1100
+
+    AP_Notify: added notify events for temperature calibration
+
+[33mcommit 3fb720354d11553c016ba06545e15f83b4e1c6cb[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 11 07:09:44 2021 +1100
+
+    AP_InertialSensor: added notify events for temperature calibration
+
+[33mcommit cc3579ea5db3fac4b9eca00d24e4acc6bec722fb[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 9 21:33:52 2021 +1100
+
+    AP_InertialSensor: change TCAL sampling to be even in temperature
+
+[33mcommit cf47c19c0d90e742397c7b4c47efff86799971df[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 11 08:09:28 2021 +1100
+
+    Filter: fixed low pass 2p filter to auto-init
+    
+    this prevents the init to zero for temperature filters
+
+[33mcommit 4495414d05b507b82658441f55d8a19be64ae829[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 9 21:04:58 2021 +1100
+
+    Filter: added reset with value to LowPassFilter2p
+
+[33mcommit 327db46c157fdb4fb31c0630c618a191057d8075[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 9 21:04:29 2021 +1100
+
+    autotest: added automatic testing of IMU Temperature calibration
+
+[33mcommit fc0f8b990a81b130284dcae231cf4ca58c49a815[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 9 16:23:18 2021 +1100
+
+    AP_InertialSensor: added online learning of temp cal
+    
+    use INS_TCAL1_ENABLE=2 to start learning
+
+[33mcommit 64d9f43d94b93d72c4faa9a2185f76af6905515f[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 9 16:22:29 2021 +1100
+
+    AP_Math: added polygon fitting code
+
+[33mcommit 720f9a1de05a5fbfdec737b4ead3460fc21c91bf[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 9 16:22:17 2021 +1100
+
+    AP_Math: cleanup maths functions
+    
+    use class template instantiation, and cleanup const in matrix code
+
+[33mcommit 6f6f89e5aab372d8dc1a9fd0671491a88edcd046[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 9 09:24:59 2021 +1100
+
+    AP_InertialSensor: enable temperature sensor on LSM9DS0
+    
+    this allows for temperature calibration of the LSM303D in CubeBlack
+    and Pixhawk1
+
+[33mcommit 0c156e324bf765197dd8222210cb4a33f8e90817[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sat Jan 9 09:24:19 2021 +1100
+
+    AP_Compass: enable temperature on lsm303d
+
+[33mcommit c0ba7c29cafec050235b1465daf7977ff40791db[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Fri Jan 8 21:50:48 2021 +1100
+
+    SITL: use TCal class for temp adjustment in SITL
+
+[33mcommit 4bdf506d10c8b8cb9928d8d00a6a6e484026c885[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Fri Jan 8 22:12:36 2021 +1100
+
+    AP_InertialSensor: apply 1e-5 scale factor
+    
+    this keeps the params in a reasonable range for parameter editors
+
+[33mcommit 0f6f6bac6b5826a3125b4b9ad4eecf02257cd90e[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Fri Jan 8 21:50:24 2021 +1100
+
+    AP_InertialSensor: expose TCal class for use in SITL
+
+[33mcommit 7921e042f19e409c166f5adcdbada242948b6e96[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Fri Jan 8 11:46:35 2021 +1100
+
+    AP_InertialSensor: added IMU temperature calibration support
+    
+    this adds parameters that can be setup by an external script for
+    compensating for temperature variation in gyros and accels using a 3rd
+    order polynomial
+
+[33mcommit c4664d8e32f6718c3d65f4488d722a33e92c2096[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Fri Jan 8 11:48:02 2021 +1100
+
+    Tools: added script to calculate IMU temp compensation parameters
+    
+    this is run over an onboard log to calculate the INS_TCAL parameters
+    to enable temperature compensation for gyro and accel
+
+[33mcommit 580cd143b8b78cc890511c2e78845fb477467610[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Fri Jan 8 11:45:27 2021 +1100
+
+    AP_AccelCal: added active() method
+
+[33mcommit f53d80374b408c142b0062ffa272fec908ba89a6[m
+Author: Siddharth Purohit <siddharthbharatpurohit@gmail.com>
+Date:   Fri Jan 8 02:20:06 2021 +0530
+
+    SITL: fix build for macos systems
+
+[33mcommit e58d2ecf2f5705b375928be61bc734766690968b[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Jan 20 21:11:03 2021 +1100
+
+    GCS_MAVLink: add mavlink command option to create a 250ms long loop
+
+[33mcommit c7a6047904a4c457f51be3c725372bebb8ed294d[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Jan 20 13:58:20 2021 +1100
+
+    autotest: add option to retry tests / create and use Test definition object
+
+[33mcommit d81c2ee407fc254b99ecd9fe85f4c51cac0c0dae[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 09:24:21 2021 +1100
+
+    HAL_ChibiOS: allow for some embedded parameters on AP_Periph builds
+
+[33mcommit fd91cb03b48de15fe8d3e68952967322cf2fa8ac[m
+Author: murata <ma2maru@gmail.com>
+Date:   Wed Jan 20 07:09:03 2021 +0900
+
+    SITL: Change the Kelvin value to a defined name
+
+[33mcommit 03b2473c612a5d45f8d8674b070ec3c5e95c4db0[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Jan 20 18:41:34 2021 +1100
+
+    autotest: correct get_parameter_direct attempts decrement
+
+[33mcommit 8b90eb23e099234f31e93f7cea3da99306b39206[m
+Author: bugobliterator <siddharthbharatpurohit@gmail.com>
+Date:   Fri Jan 15 02:07:41 2021 +0530
+
+    AP_HAL_ChibiOS: distcc doesn't like lst generation commands
+
+[33mcommit 9e15b5785be773b0c6780ca0fe2efc979391407e[m
+Author: bugobliterator <siddharthbharatpurohit@gmail.com>
+Date:   Fri Jan 15 02:06:56 2021 +0530
+
+    ardupilotwaf: fix spec args as distcc doesn't like it
+
+[33mcommit 0d0ff632420847e4328ce29739afd7c13c43e4e5[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Wed Oct 7 11:19:31 2020 +0900
+
+    Plane: ensure wp_nav::wp_and_spline_init is called at least once
+
+[33mcommit 031be010accbaf615d0fa037875f18aa1239c282[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Jan 4 11:57:14 2021 +0900
+
+    AC_AttitudeControl: tailsitter sets target rates more efficiently
+
+[33mcommit 5efe94a77159cebe357f6f2bb70a3fab73640798[m
+Author: Leonard Hall <leonardthall@gmail.com>
+Date:   Tue Dec 15 23:18:30 2020 +1030
+
+    Copter: use AP_Math control functions
+
+[33mcommit 4e2c7880c5e5086d8ef898a39360d24b88d0ddd7[m
+Author: Leonard Hall <leonardthall@gmail.com>
+Date:   Tue Dec 15 23:18:49 2020 +1030
+
+    AC_Avoidance: use AP_Math control functions
+
+[33mcommit e2308e94149088aedcb253cc10c01d357f7e2df4[m
+Author: Leonard Hall <leonardthall@gmail.com>
+Date:   Tue Sep 8 00:01:06 2020 +0930
+
+    AC_Loiter: use AP_Math control tools common functions
+
+[33mcommit 6320338771b26663b2c059060129fb58dab798a1[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Wed Jan 20 10:37:19 2021 +0900
+
+    AC_PosControl: use AP_Math control functions
+
+[33mcommit 1129a3fd596d973acf38fb0183030fd9297b6ad3[m
+Author: Leonard Hall <leonardthall@gmail.com>
+Date:   Mon Sep 7 23:02:31 2020 +0930
+
+    AC_AttitudeControl: use AP_Math control functions
+
+[33mcommit 1e38440c8320b54fbd845d85d0b64be958cd1819[m
+Author: Leonard Hall <leonardthall@gmail.com>
+Date:   Mon Sep 7 18:17:51 2020 +0930
+
+    AP_Math: add control common functions
+
+[33mcommit 2fadcf6ba03de8da8adc271f994f05ada47d1296[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Mon Jan 18 21:43:25 2021 +0000
+
+    AP_HAL_ChibiOS: handle UP/CH channel sharing on H7 correctly
+
+[33mcommit 9e641a32adf2981abad3dfc6cd07356a36b8db4e[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Sun Jan 17 08:59:44 2021 +0000
+
+    AP_HAL_ChibiOS: don't share flash SPI on BeastH7 and compile with -Os
+
+[33mcommit 2b885cd79fed463d7f94322f294aa879a6ed8c0c[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Sat Jan 16 09:05:09 2021 +0000
+
+    AP_HAL_ChibiOS: ensure that serial LED setup goes via an intermediate buffer
+    
+    protect serial LED buffer transfers with mutex
+    protect serial LED buffer size with mutex
+    prevent serial LED interactions before rcout is ready
+    allocate a serial led buffer per channel that needs it
+    setup clock mask when needed
+
+[33mcommit ecfcd98f8abf5c149d220492b048c8c39730954c[m
+Author: yaapu <alex.apostoli@gmail.com>
+Date:   Mon Dec 21 22:41:26 2020 +0100
+
+    AP_RCTelemetry: apply a 5s hysteresis to RF mode changes and rate reporting
+
+[33mcommit 23158480c78f6c966028dad6d7d7c34ec14676ca[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Mon Dec 21 20:04:17 2020 +0000
+
+    AP_RCTelemetry: calculate CRSF custom frame support correctly
+
+[33mcommit 39219451bd4b7f6809f5fcc9cbaf4680c7c394f5[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Mon Dec 21 18:14:18 2020 +0000
+
+    AP_RCTelemetry: detect CRSF tracer RX and switch to 250Hz high speed telemetry
+
+[33mcommit f6a2d20579f90ef94ef2df18534c2b37d15b57da[m
+Author: Andy Piper <github@andypiper.com>
+Date:   Mon Dec 21 18:13:58 2020 +0000
+
+    AP_RCProtocol: add tracer 250Hz mode
+
+[33mcommit 79640e5d94ec4495b7df7c84ef752fb1ac9c1470[m
+Author: yaapu <alex.apostoli@gmail.com>
+Date:   Thu Dec 10 10:29:40 2020 +0100
+
+    RC_Channel: added support for passthrough telemetry over crossfire
+
+[33mcommit 1c3b7d5ecd2039d91aa20da8534173fdb5d8858c[m
+Author: yaapu <alex.apostoli@gmail.com>
+Date:   Thu Dec 10 10:29:17 2020 +0100
+
+    GCS_MAVLink: added support for passthrough telemetry over crossfire
+
+[33mcommit 6b26a64f77e28c937e3522a82ead6b77996a5988[m
+Author: yaapu <alex.apostoli@gmail.com>
+Date:   Thu Dec 10 10:28:56 2020 +0100
+
+    AP_Frsky_Telem: added support for passthrough telemetry over crossfire
+
+[33mcommit 5ef20aec27412d3b67d5ffb7b871109f051a9c36[m
+Author: yaapu <alex.apostoli@gmail.com>
+Date:   Thu Dec 10 10:28:41 2020 +0100
+
+    AP_RCProtocol: added support for passthrough telemetry over crossfire
+
+[33mcommit 4933544489660385a1388582013219e9e278a8e3[m
+Author: yaapu <alex.apostoli@gmail.com>
+Date:   Thu Dec 10 10:28:20 2020 +0100
+
+    AP_RCTelemetry: added support for passthrough telemetry over crossfire
+
+[33mcommit 9db0862d613552ec13ef4ee06a0d9e8917f67d02[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 10:23:45 2021 +1100
+
+    HAL_Linux: use nullptr for vnav rcinput
+    
+    this makes it clearer what is going on
+
+[33mcommit 0b83d4516389388f62a7a0df71fc59d911ed9496[m
+Author: Randy Mackay <rmackay9@yahoo.com>
+Date:   Mon Jan 4 11:10:14 2021 +0900
+
+    Copter: verify land and payload place record flow-of-control internal error
+
+[33mcommit 7e89c05204808473ee5e5e27a787a7c38c61f1c9[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Tue Jan 19 06:49:10 2021 +1100
+
+    autotest: fixed --tracker option to sim_vehicle.py
+
+[33mcommit 15fd8480f8c57fc81e36e02e01d699d59a02276b[m
+Author: Michael du Breuil <wicked.shell.scripts@gmail.com>
+Date:   Tue Jan 19 14:31:48 2021 -0700
+
+    AP_EFI: Correct a bad conversion from Kelvin to Celsius
+    
+    (was off by 0.15 degrees)
+
+[33mcommit dff6a5bff9469086f9801e54bb624109b8c7fdc2[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Fri Jan 15 08:44:28 2021 +1100
+
+    HAL_Empty: allow return of last value in RCOutput
+    
+    this is needed for linux boards with no native RCOutput that use SBUS
+    out on a serial port to ensure they can display the servo values in
+    the GCS
+
+[33mcommit 1ce77111e54bbe9e7708c2c0740c553d0b142745[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jan 14 09:43:27 2021 +1100
+
+    AP_AHRS: allow override of default EKF type
+
+[33mcommit 009cb8f62b3e2a638ab8bf5196e6d1e287a850b2[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jan 14 08:37:52 2021 +1100
+
+    HAL_Linux: setup RCIN for vnav
+
+[33mcommit bd9dd7ff4c4412da75b792cc4b81905f80a7eee1[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jan 14 08:08:05 2021 +1100
+
+    Tools: added vnav linux target
+
+[33mcommit a9f8c9517ce87e872413de3bdd5d28853007602c[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jan 14 08:08:05 2021 +1100
+
+    AP_HAL: added vnav linux target
+
+[33mcommit 103d6c54e193b655d3f58a3312e9f5171810108a[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Thu Jan 14 08:08:05 2021 +1100
+
+    AP_ExternalAHRS: added vnav linux target
+
+[33mcommit c396d15890b1a00a600ef33d77242b163a349424[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Wed Jan 20 08:17:57 2021 +1100
+
+    Revert "autotest: ensure defaults files don't set already-default-values"
+    
+    This reverts commit 3d431cd4f17dfe8462e7b8935e090e0ae74fd59d.
+    
+    It breaks MissionPlanner SITL. We can re-apply once MissionPlanner
+    copes with external_model.
+
+[33mcommit 04a52835c05004ad2a40f714bfb1320d94782b87[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Tue Jan 19 18:34:54 2021 +1100
+
+    autotest: correct Rover set-position-target-global-int test
+    
+    The vehicles doesn't send us set messages!
+
+[33mcommit 933aba66f8b29af284a0c3ef3598dc872d404cdc[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Tue Jan 19 14:36:07 2021 +1100
+
+    AP_HAL_SITL: avoid nullptr dereference in Replay
+
+[33mcommit 1cb86303b45a8b7525edf2d9ef2a6ad5c0d190b0[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Jan 13 22:06:22 2021 +1100
+
+    Tools: add test for maxbotixi2cxl
+
+[33mcommit c0ea19e5c588d86d78b3b7521765c22f2aa8b5e2[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Wed Jan 13 22:02:20 2021 +1100
+
+    SITL: add test for maxbotixi2cxl
+
+[33mcommit 78b49a2c355bc6b67020c5ae6ec789b0d3d2fac7[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Jun 19 11:25:39 2020 +1000
+
+    AP_RangeFinder: maxbotix: use i2c-address parameter
+
+[33mcommit 5e00f5ae487292599208bd2689efb36a8fa01cc9[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Wed Nov 11 17:15:42 2020 +0000
+
+    Tools: ardupilotwaf: ap_library: add genrated bindings to whitle list and add support for ends with whitle listing
+
+[33mcommit 8d7299d05252bea05e406371b004c386878d38bf[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Wed Nov 11 16:06:50 2020 +0000
+
+    Tools: ardupilotwaf: ap_library.py: allow vehicle in build/
+
+[33mcommit 9be19b0bfa18e5d4f4729be9e5d596e1a53426fa[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Nov 3 18:38:16 2020 +0000
+
+    AP_Scripting: add plane spesific quadplane in_vtol_mode binding
+
+[33mcommit e4fbe64616ad4bd3b44f9a03786ecea30f323c8e[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Fri Nov 6 16:20:02 2020 +0000
+
+    Plane: add QuadPlane singleton
+
+[33mcommit 7de14f2e2f452e8d912a027f2cf5c997c2760e13[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Nov 3 00:42:56 2020 +0000
+
+    AP_Scripting: desc: update AP_Terrain depends
+
+[33mcommit 2a75432fa28a28cf3e1a192e8724705dcd464c72[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Tue Nov 3 00:43:35 2020 +0000
+
+    AP_Scripting: Generator: support depends
+
+[33mcommit 05fb14e5d99073974ee37110a2566986b7d4e0ea[m
+Author: Peter Hall <iampete@hotmail.co.uk>
+Date:   Sun Jan 10 17:11:00 2021 +0000
+
+    Plane: tailsitter start transition from initial pitch
+
+[33mcommit 30a4747898dfae76111a862c451c6a994aaf2886[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Fri Jan 15 08:54:37 2021 +0100
+
+    GCS_MAVLink: send sim_state msg
+
+[33mcommit c1f1208c893b2eda5bec1f7cfb95c02733623df1[m
+Author: Pierre Kancir <pierre.kancir.emn@gmail.com>
+Date:   Fri Jan 15 08:54:15 2021 +0100
+
+    SITL: add support for SIM_STATE msg
+
+[33mcommit 8eb670d685adb95e91c97a9f3049fa8cdb7cef4c[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Jan 15 23:03:01 2021 +1100
+
+    autotest: trim default values from rover defaults files
+
+[33mcommit 3d431cd4f17dfe8462e7b8935e090e0ae74fd59d[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Jan 15 16:13:01 2021 +1100
+
+    autotest: ensure defaults files don't set already-default-values
+    
+    autotest: mark some vehicles as having external physics models
+    
+    autotest: add default_params_filename to some vehicle info
+
+[33mcommit 7d86cc08ad25701d971eb1f3465ed3d628630e4c[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Jan 15 21:58:09 2021 +1100
+
+    autotest: correct SITL commandline for no default parameter file
+
+[33mcommit 8f9d3909f165c9f7643ac5b1f13dd78fa4ddb185[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Fri Jan 15 17:45:10 2021 +1100
+
+    autotest: model_defaults_filepath always returns a list
+
+[33mcommit d9dbcb17c40730821870228836d0e034fe4e1e94[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Sun Jan 17 08:36:53 2021 +1100
+
+    AP_Math: enable constrain value with line numbers on all boards
+
+[33mcommit 4dec597372946d527ce4117030228e7d69da36c7[m
+Author: Iampete1 <iampete@hotmail.co.uk>
+Date:   Sun Jan 17 00:07:15 2021 +0000
+
+    Plane: move quadplane logging to QuadPlane: update()
+
+[33mcommit 5def8a64ab1e4535e6fb68c3bbc8cc9a65408426[m
+Author: Andrew Tridgell <andrew@tridgell.net>
+Date:   Mon Jan 18 09:18:48 2021 +1100
+
+    SITL: avoid negative current and voltage in flightaxis
+    
+    RealFlight9 will sometimes give meaningless negative values
+
+[33mcommit 30eed3103bfdf54b68aa015f6af6814ed96da998[m
+Author: André <andre.kjellstrup@gmail.com>
+Date:   Mon Jan 18 13:18:58 2021 +0100
+
+    sim_vehicle fix
+
+[33mcommit 210b0e7c5fb2b08d19bdac50dca9c5474257d5a1[m
+Author: Peter Barker <pbarker@barker.dropbear.id.au>
+Date:   Sun Jan 17 12:52:35 2021 +1100
+
+    autotest: stop emitting port 14550 all the time
+    
+    this can confuse other things going on on the same machine.  It is still
+    available by specifying --viewerip if desired
